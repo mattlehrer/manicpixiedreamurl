@@ -1,8 +1,11 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	export let data;
+</script>
+
+<h1>Welcome to {data.origin}</h1>
 
 <style>
 	h1 {
-		color: var(--blue-7);
+		color: var(--blue-4);
 	}
 </style>

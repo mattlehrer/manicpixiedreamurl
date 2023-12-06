@@ -5,3 +5,4 @@ A social network for parked domains
 TODO: 
 - auth
 - tables
+- dashboard

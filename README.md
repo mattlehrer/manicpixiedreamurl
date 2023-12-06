@@ -2,4 +2,6 @@
 
 A social network for parked domains
 
-TODO: auth
+TODO: 
+- auth
+- tables

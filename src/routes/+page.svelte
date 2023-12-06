@@ -3,6 +3,7 @@
 </script>
 
 <h1>Welcome to {data.origin}</h1>
+<p>More coming soon</p>
 
 <style>
 	h1 {

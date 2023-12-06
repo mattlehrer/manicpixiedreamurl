@@ -11,3 +11,9 @@
 		<slot />
 	</main>
 </div>
+
+<style>
+	main {
+		padding: var(--size-fluid-4);
+	}
+</style>

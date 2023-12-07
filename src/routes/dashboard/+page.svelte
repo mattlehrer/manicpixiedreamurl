@@ -32,12 +32,6 @@
 	{/each}
 </ul>
 
-<hr />
-<p>User id: {data.userId}</p>
-<form method="post" action="?/logout" use:enhance>
-	<input type="submit" value="Sign out" />
-</form>
-
 <style>
 	li {
 		margin-block-start: var(--size-2);

@@ -24,3 +24,8 @@ li {
 input[type='submit'] {
 	margin-block-start: var(--size-2);
 }
+
+form p.error {
+	color: var(--red-7);
+	font-size: var(--font-size-1);
+}

@@ -43,8 +43,4 @@
 		margin-block-start: var(--size-2);
 		font-size: var(--font-size-fluid-1);
 	}
-
-	p.error {
-		color: var(--red-7);
-	}
 </style>

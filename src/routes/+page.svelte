@@ -6,7 +6,7 @@
 	export let data: PageData;
 </script>
 
-<h1>Welcome to {data.origin}</h1>
+<h1>Welcome to {data.host}</h1>
 <p>More coming soon</p>
 <hr />
 <p>User id: {data.userId}</p>
@@ -18,5 +18,6 @@
 <style>
 	h1 {
 		color: var(--blue-4);
+		font-size: var(--font-size-fluid-3);
 	}
 </style>

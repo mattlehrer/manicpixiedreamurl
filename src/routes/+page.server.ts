@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	return {
 		userId: session.user.userId,
 		username: session.user.username,
-		origin: url.origin,
+		host: url.host,
 	};
 };
 

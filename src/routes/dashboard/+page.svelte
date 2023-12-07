@@ -15,8 +15,8 @@
 </form>
 
 <style>
-	h1 {
-		color: var(--blue-4);
-		font-size: var(--font-size-fluid-3);
+	li {
+		margin-block-start: var(--size-2);
+		font-size: var(--font-size-fluid-1);
 	}
 </style>

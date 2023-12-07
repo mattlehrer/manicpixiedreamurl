@@ -9,7 +9,6 @@
 
 <style>
 	h1 {
-		color: var(--blue-4);
 		font-size: var(--font-size-fluid-3);
 	}
 </style>

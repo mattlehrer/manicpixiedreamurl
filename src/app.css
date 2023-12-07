@@ -8,3 +8,19 @@ form {
 label {
 	margin-block-end: var(--size-1);
 }
+
+h1 {
+	font-size: var(--font-size-fluid-3);
+}
+h2 {
+	font-size: var(--font-size-fluid-2);
+}
+
+li {
+	margin-block-start: var(--size-2);
+	font-size: var(--font-size-fluid-1);
+}
+
+input[type='submit'] {
+	margin-block-start: var(--size-2);
+}

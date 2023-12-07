@@ -7,7 +7,28 @@
 </script>
 
 <h1>Welcome {data.username}</h1>
-<p>More coming soon</p>
+
+<form action="?/addDomain" method="post">
+	<label for="domain"> Add a domain </label>
+	<input type="text" name="domain" placeholder="Domain" />
+	<input type="submit" value="Add domain" />
+</form>
+
+<hr />
+
+<h2>Domains</h2>
+<ul>
+	{#each data.domains as domain}
+		<li>
+			<a href="https://{domain.name}">{domain.name}</a>
+			<!-- <form method="post" action="?/removeDomain" use:enhance>
+				<input type="hidden" name="domain" value={domain} />
+				<input type="submit" value="Remove" />
+			</form> -->
+		</li>
+	{/each}
+</ul>
+
 <hr />
 <p>User id: {data.userId}</p>
 <form method="post" action="?/logout" use:enhance>

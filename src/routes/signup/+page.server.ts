@@ -18,17 +18,23 @@ export const actions: Actions = {
 		// basic check
 		if (typeof username !== 'string' || username.length < 3 || username.length > 31) {
 			return fail(400, {
-				message: 'Invalid username',
+				username,
+				email,
+				invalidUsername: true,
 			});
 		}
 		if (typeof email !== 'string' || email.length < 3 || email.length > 255 || !email.includes('@')) {
 			return fail(400, {
-				message: 'Invalid email',
+				username,
+				email,
+				invalidEmail: true,
 			});
 		}
 		if (typeof password !== 'string' || password.length < 4 || password.length > 255) {
 			return fail(400, {
-				message: 'Invalid password',
+				username,
+				email,
+				invalidPassword: true,
 			});
 		}
 		try {
@@ -54,11 +60,13 @@ export const actions: Actions = {
 			console.error(e);
 			if (e instanceof Database.SqliteError && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
 				return fail(400, {
-					message: 'Username already taken',
+					username,
+					email,
+					duplicate: true,
 				});
 			}
 			return fail(500, {
-				message: 'An unknown error occurred',
+				serverError: true,
 			});
 		}
 		throw redirect(302, '/dashboard');

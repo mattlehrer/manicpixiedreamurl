@@ -1,16 +1,19 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
 	export let data: PageData;
+	export let form: ActionData;
 </script>
 
 <h1>Welcome {data.username}</h1>
 
 <form action="?/addDomain" method="post">
-	<label for="domain"> Add a domain </label>
-	<input type="text" name="domain" placeholder="Domain" />
+	{#if form?.invalid}<p class="error">Please enter a valid domain name.</p>{/if}
+	{#if form?.subdomain}<p class="error">Subdomains are not permitted.</p>{/if}
+	<label for="domain">Add a domain</label>
+	<input type="text" name="domain" placeholder="Domain" value={form?.domain ?? ''} />
 	<input type="submit" value="Add domain" />
 </form>
 
@@ -39,5 +42,9 @@
 	li {
 		margin-block-start: var(--size-2);
 		font-size: var(--font-size-fluid-1);
+	}
+
+	p.error {
+		color: var(--red-7);
 	}
 </style>

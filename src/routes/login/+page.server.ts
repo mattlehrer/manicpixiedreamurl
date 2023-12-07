@@ -16,13 +16,11 @@ export const actions: Actions = {
 		const password = formData.get('password');
 		// basic check
 		if (typeof username !== 'string' || username.length < 1 || username.length > 31) {
-			return fail(400, {
-				message: 'Invalid username',
-			});
+			return fail(400, { username, invalidUsername: true });
 		}
 		if (typeof password !== 'string' || password.length < 1 || password.length > 255) {
 			return fail(400, {
-				message: 'Invalid password',
+				invalidPassword: true,
 			});
 		}
 		try {
@@ -44,7 +42,7 @@ export const actions: Actions = {
 				});
 			}
 			return fail(500, {
-				message: 'An unknown error occurred',
+				serverError: true,
 			});
 		}
 		throw redirect(302, '/dashboard');

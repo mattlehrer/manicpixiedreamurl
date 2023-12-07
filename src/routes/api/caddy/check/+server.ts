@@ -9,6 +9,10 @@ export const GET: RequestHandler = async ({ url }) => {
 		return new Response('', { status: 400 });
 	}
 
+	if (toCheck.endsWith('manicpixiedreamurl.com')) {
+		return new Response('', { status: 200 });
+	}
+
 	const exists = await db
 		.select({ name: domain.name, isActive: domain.isActive })
 		.from(domain)

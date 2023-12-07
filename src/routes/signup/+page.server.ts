@@ -1,4 +1,5 @@
 import { auth } from '$lib/server/lucia';
+import isEmail from 'validator/lib/isEmail';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import Database from 'better-sqlite3';
@@ -23,7 +24,7 @@ export const actions: Actions = {
 				invalidUsername: true,
 			});
 		}
-		if (typeof email !== 'string' || email.length < 3 || email.length > 255 || !email.includes('@')) {
+		if (typeof email !== 'string' || email.length < 3 || email.length > 255 || !isEmail(email)) {
 			return fail(400, {
 				username,
 				email,

@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { text, sqliteTable, blob, integer, unique } from 'drizzle-orm/sqlite-core';
+import { text, sqliteTable, blob, integer, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { createId } from '@paralleldrive/cuid2';
 
 export const user = sqliteTable('user', {
@@ -32,18 +32,26 @@ export const key = sqliteTable('user_key', {
 	hashedPassword: text('hashed_password'),
 });
 
-export const domain = sqliteTable('domain', {
-	id: text('id')
-		.primaryKey()
-		.$defaultFn(() => createId()),
-	name: text('name').notNull().unique(),
-	ownerId: text('owner_id')
-		.notNull()
-		.references(() => user.id),
-	isActive: integer('is_active', { mode: 'boolean' }),
-	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
-});
+export const domain = sqliteTable(
+	'domain',
+	{
+		id: text('id')
+			.primaryKey()
+			.$defaultFn(() => createId()),
+		name: text('name').notNull().unique(),
+		ownerId: text('owner_id')
+			.notNull()
+			.references(() => user.id),
+		isActive: integer('is_active', { mode: 'boolean' }),
+		createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => {
+		return {
+			nameIdx: uniqueIndex('email_idx').on(table.name),
+		};
+	},
+);
 
 export const idea = sqliteTable('idea', {
 	id: text('id')

@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { text, sqliteTable, blob, integer, unique } from 'drizzle-orm/sqlite-core';
+import { createId } from '@paralleldrive/cuid2';
 
 export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
@@ -32,7 +33,9 @@ export const key = sqliteTable('user_key', {
 });
 
 export const domain = sqliteTable('domain', {
-	id: text('id').primaryKey(),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	name: text('name').notNull().unique(),
 	ownerId: text('owner_id')
 		.notNull()
@@ -43,7 +46,9 @@ export const domain = sqliteTable('domain', {
 });
 
 export const idea = sqliteTable('idea', {
-	id: text('id').primaryKey(),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	domainId: text('domain_id')
 		.notNull()
 		.references(() => domain.id),
@@ -58,7 +63,9 @@ export const idea = sqliteTable('idea', {
 export const vote = sqliteTable(
 	'vote',
 	{
-		id: text('id').primaryKey(),
+		id: text('id')
+			.primaryKey()
+			.$defaultFn(() => createId()),
 		type: text('text', { enum: ['up', 'down'] }),
 		ideaId: text('idea_id')
 			.notNull()

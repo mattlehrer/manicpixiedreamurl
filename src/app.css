@@ -16,6 +16,7 @@ label {
 
 h1 {
 	font-size: var(--font-size-fluid-3);
+	line-height: 1.05;
 }
 
 h2 {

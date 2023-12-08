@@ -17,8 +17,21 @@ label {
 h1 {
 	font-size: var(--font-size-fluid-3);
 }
+
 h2 {
 	font-size: var(--font-size-fluid-2);
+	color: var(--text-2);
+	line-height: 1.05;
+	margin-block-start: var(--size-1);
+	margin-block-end: var(--size-8);
+}
+
+p {
+	max-width: 50ch;
+	margin-block-start: var(--size-fluid-3);
+	font-size: var(--font-size-fluid-1);
+	color: var(--text-1);
+	line-height: 1.5;
 }
 
 li {

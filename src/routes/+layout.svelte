@@ -3,22 +3,28 @@
 	import 'open-props/normalize';
 	import 'open-props/buttons';
 	import '../app.css';
-	import type { LayoutData } from './$types';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
+	import type { LayoutData } from './$types';
+	import { dashboardSite } from '$lib/config';
+	import NetworkSite from '$lib/components/NetworkSite.svelte';
 
 	export let data: LayoutData;
 </script>
 
-<div>
-	<Header username={data.username} />
+{#if data.host === dashboardSite}
+	<div>
+		<Header username={data.username} />
 
-	<main>
-		<slot />
-	</main>
+		<main>
+			<slot />
+		</main>
 
-	<Footer />
-</div>
+		<Footer />
+	</div>
+{:else}
+	<NetworkSite host={data.host} />
+{/if}
 
 <style>
 	div {

@@ -4,13 +4,17 @@ import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
-	const toCheck = url.searchParams.get('domain');
+	let toCheck = url.searchParams.get('domain');
 	if (!toCheck) {
 		return new Response('', { status: 400 });
 	}
 
 	if (toCheck.endsWith('manicpixiedreamurl.com')) {
 		return new Response('', { status: 200 });
+	}
+
+	if (toCheck.startsWith('www.')) {
+		toCheck = toCheck.replace('www.', '');
 	}
 
 	const exists = await db

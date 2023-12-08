@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-
 	import type { ActionData, PageData } from './$types';
 
 	export let data: PageData;
@@ -9,8 +8,11 @@
 
 <h1>Welcome {data.username}</h1>
 
-<form action="?/addDomain" method="post">
+<form action="?/addDomain" method="post" use:enhance>
 	{#if form?.invalid}<p class="error">Please enter a valid domain name.</p>{/if}
+	{#if form?.tooMany}<p class="error">
+			You are currently only allowed {form.tooMany} domains. Paid plans for more domains coming soon.
+		</p>{/if}
 	{#if form?.subdomain}<p class="error">Subdomains are not permitted.</p>{/if}
 	<label for="domain">Add a domain</label>
 	<input type="text" name="domain" placeholder="Domain" value={form?.domain ?? ''} />
@@ -20,6 +22,7 @@
 <hr />
 
 <h2>Domains</h2>
+<p>You are currently using {data.domains.length} out of {data.maxDomains} domains on your current plan.</p>
 <ul>
 	{#each data.domains as domain}
 		<li>
@@ -33,6 +36,10 @@
 </ul>
 
 <style>
+	ul {
+		margin-block-start: var(--size-5);
+	}
+
 	li {
 		margin-block-start: var(--size-2);
 		font-size: var(--font-size-fluid-1);

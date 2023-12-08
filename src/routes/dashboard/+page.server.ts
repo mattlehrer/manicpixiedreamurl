@@ -4,6 +4,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { auth } from '$lib/server/lucia';
 import { getDomainsForUser, insertDomain } from '$lib/server/handlers';
 
+const MAX_DOMAINS = 3;
+
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth?.validate();
 	if (!session) throw redirect(302, '/login');
@@ -17,6 +19,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		userId: session.user.userId,
 		username: session.user.username,
 		domains,
+		maxDomains: MAX_DOMAINS,
 	};
 };
 
@@ -24,6 +27,11 @@ export const actions: Actions = {
 	addDomain: async ({ locals, request }) => {
 		const session = await locals.auth.validate();
 		if (!session) return fail(401);
+
+		// check if user is allowed to add domains
+		const domains = await getDomainsForUser(session.user.userId);
+		if (domains.length >= MAX_DOMAINS) return fail(400, { tooMany: MAX_DOMAINS });
+
 		const data = await request.formData();
 		const domain = data.get('domain');
 

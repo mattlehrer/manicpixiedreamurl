@@ -10,7 +10,7 @@
 		{#if username}
 			<div>
 				<a href="/dashboard">Dashboard</a>
-				<form method="post" action="?/logout" use:enhance>
+				<form method="post" action="/dashboard?/logout" use:enhance>
 					<input type="submit" value="Sign out" />
 				</form>
 			</div>

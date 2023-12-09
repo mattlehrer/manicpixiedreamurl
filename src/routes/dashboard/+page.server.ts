@@ -3,6 +3,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { auth } from '$lib/server/lucia';
 import { getDomainsForUser, insertDomain } from '$lib/server/handlers';
+import { dev } from '$app/environment';
 
 const MAX_DOMAINS = 3;
 
@@ -42,7 +43,7 @@ export const actions: Actions = {
 		// check that this is just a domain name
 		const parseResult = parseDomain(domain);
 		console.log({ parseResult });
-		if (![ParseResultType.Listed, ParseResultType.NotListed].includes(parseResult.type))
+		if (!dev && ![ParseResultType.Listed, ParseResultType.NotListed].includes(parseResult.type))
 			return fail(400, { domain, invalid: true });
 
 		if (parseResult.type === ParseResultType.Listed && parseResult.subDomains.length)

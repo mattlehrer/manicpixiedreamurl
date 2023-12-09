@@ -16,6 +16,9 @@
 	{#if form?.subdomain}<p class="error">Subdomains are not permitted.</p>{/if}
 	<label for="domain">Add a domain</label>
 	<input type="text" name="domain" placeholder="Domain" value={form?.domain ?? ''} />
+	<label for="reason">Add a reason you bought this domain</label>
+	<input type="text" name="reason" placeholder="" value={form?.invalidReason ?? ''} />
+
 	<input type="submit" value="Add domain" />
 </form>
 

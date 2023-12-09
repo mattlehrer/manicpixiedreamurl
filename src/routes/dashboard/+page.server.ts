@@ -34,8 +34,10 @@ export const actions: Actions = {
 
 		const data = await request.formData();
 		const domain = data.get('domain');
+		const reason = data.get('reason');
 
 		if (!domain || typeof domain !== 'string') return fail(400, { domain, invalid: true });
+		if (!reason || typeof reason !== 'string') return fail(400, { reason, invalidReason: true });
 
 		// check that this is just a domain name
 		const parseResult = parseDomain(domain);
@@ -49,6 +51,7 @@ export const actions: Actions = {
 		const inserted = await insertDomain({
 			ownerId: session.user.userId,
 			name: domain,
+			reason,
 			isActive: true,
 		});
 		console.log({ inserted });

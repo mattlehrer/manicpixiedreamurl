@@ -14,7 +14,8 @@ export const auth = lucia({
 	}),
 	sessionCookie: {
 		attributes: {
-			sameSite: undefined,
+			// @ts-expect-error: Lucia does not allow "None" but this works in Chrome
+			sameSite: 'None',
 		},
 	},
 

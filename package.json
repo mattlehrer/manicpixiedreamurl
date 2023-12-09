@@ -14,7 +14,7 @@
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
 		"generate": "drizzle-kit generate:sqlite",
-		"migrate": "tsx src/migrate.ts",
+		"migrate": "tsx ./migrate.ts",
 		"db:push": "drizzle-kit push:sqlite"
 	},
 	"devDependencies": {

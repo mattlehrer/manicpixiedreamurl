@@ -15,6 +15,13 @@
       "when": 1701944757387,
       "tag": "0001_military_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1702042064667,
+      "tag": "0002_legal_silver_surfer",
+      "breakpoints": true
     }
   ]
 }

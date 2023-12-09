@@ -12,6 +12,11 @@ export const auth = lucia({
 		key: 'user_key',
 		session: 'user_session',
 	}),
+	sessionCookie: {
+		attributes: {
+			sameSite: undefined,
+		},
+	},
 
 	getUserAttributes: (data) => {
 		return {

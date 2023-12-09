@@ -15,8 +15,8 @@
 		</p>{/if}
 	{#if form?.subdomain}<p class="error">Subdomains are not permitted.</p>{/if}
 	<label for="domain">Add a domain</label>
-	<input type="text" name="domain" placeholder="Domain" value={form?.domain ?? ''} />
-	<label for="reason">Add a reason you bought this domain</label>
+	<input type="text" name="domain" placeholder="example.com" value={form?.domain ?? ''} />
+	<label for="reason">Add a reason you bought it</label>
 	<input type="text" name="reason" placeholder="" value={form?.invalidReason ?? ''} />
 
 	<input type="submit" value="Add domain" />
@@ -29,7 +29,7 @@
 <ul>
 	{#each data.domains as domain}
 		<li>
-			<a href="https://{domain.name}">{domain.name}</a>
+			<a href="https://{domain.name}">{domain.name}</a> because {domain.reason}
 			<!-- <form method="post" action="?/removeDomain" use:enhance>
 				<input type="hidden" name="domain" value={domain} />
 				<input type="submit" value="Remove" />
@@ -39,6 +39,10 @@
 </ul>
 
 <style>
+	label {
+		display: block;
+		margin-block-start: var(--size-2);
+	}
 	ul {
 		margin-block-start: var(--size-5);
 	}

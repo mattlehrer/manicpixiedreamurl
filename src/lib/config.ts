@@ -1,3 +1,3 @@
 import { dev } from '$app/environment';
 
-export const dashboardSite = dev ? 'localhost:5173' : 'manicpixiedreamurl.com';
+export const dashboardSite = dev ? 'http://localhost:5173' : 'https://manicpixiedreamurl.com';

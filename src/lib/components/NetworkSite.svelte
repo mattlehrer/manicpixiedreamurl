@@ -1,12 +1,17 @@
 <script lang="ts">
+	import { dashboardSite } from '$lib/config';
+
 	export let host: string;
 </script>
 
 <div class="wrapper">
 	<!-- TODO: add header iframe with user state -->
+	<iframe src={`${dashboardSite}/network`} title="Manic Pixie Dream URL user state" />
 
 	<h1>Welcome to {host}</h1>
 	<p>More coming soon</p>
+
+	<!-- submit idea -->
 </div>
 
 <style>

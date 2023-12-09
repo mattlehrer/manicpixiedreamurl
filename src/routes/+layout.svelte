@@ -12,7 +12,9 @@
 	export let data: LayoutData;
 </script>
 
-{#if data.host === dashboardSite}
+{#if data.pathname.endsWith('/network')}
+	<slot />
+{:else if data.origin === dashboardSite}
 	<div>
 		<Header username={data.username} />
 

@@ -3,15 +3,16 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals, url }) => {
-	const host = url.host;
-	if (host !== dashboardSite && !['/'].includes(url.pathname)) {
+	if (url.origin !== dashboardSite && !['/'].includes(url.pathname)) {
 		throw redirect(303, '/');
 	}
 
 	const session = await locals.auth?.validate();
 
 	return {
-		host,
+		origin: url.origin,
+		host: url.host,
+		pathname: url.pathname,
 		username: session?.user.username,
 	};
 };

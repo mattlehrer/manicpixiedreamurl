@@ -22,6 +22,13 @@
       "when": 1702042064667,
       "tag": "0002_legal_silver_surfer",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1702135570852,
+      "tag": "0003_majestic_the_captain",
+      "breakpoints": true
     }
   ]
 }

@@ -11,3 +11,21 @@ export const insertDomain = (newDomain: NewDomain) => {
 export const getDomainsForUser = (ownerId: string) => {
 	return db.select().from(domain).where(eq(domain.ownerId, ownerId));
 };
+
+export const getDomainByName = async (name: string) => {
+	return db.query.domain.findFirst({
+		where: (domain, { and, eq }) => and(eq(domain.name, name), eq(domain.isActive, true)),
+		columns: {
+			name: true,
+			reason: true,
+			isActive: true,
+		},
+		with: {
+			owner: {
+				columns: {
+					username: true,
+				},
+			},
+		},
+	});
+};

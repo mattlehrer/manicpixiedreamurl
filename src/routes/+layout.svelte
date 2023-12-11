@@ -12,9 +12,7 @@
 	export let data: LayoutData;
 </script>
 
-{#if data.pathname.endsWith('/network')}
-	<slot />
-{:else if data.origin === dashboardSite}
+{#if data.origin === dashboardSite}
 	<div>
 		<Header username={data.username} />
 
@@ -24,8 +22,10 @@
 
 		<Footer />
 	</div>
+{:else if data.domain !== undefined}
+	<NetworkSite host={data.host} domain={data.domain} />
 {:else}
-	<NetworkSite host={data.host} />
+	<!-- 404 from +layout.server -->
 {/if}
 
 <style>

@@ -31,7 +31,7 @@ export const actions: Actions = {
 				invalidEmail: true,
 			});
 		}
-		if (typeof password !== 'string' || password.length < 4 || password.length > 255) {
+		if (typeof password !== 'string' || password.length < 5 || password.length > 255) {
 			return fail(400, {
 				username,
 				email,

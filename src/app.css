@@ -14,6 +14,16 @@ label {
 	margin-block-end: var(--size-1);
 }
 
+label:first-child {
+	margin-block-start: var(--size-6);
+}
+
+form p.error {
+	color: var(--red-7);
+	font-size: var(--font-size-1);
+	margin-block-start: calc(var(--size-6) - 1lh);
+}
+
 h1 {
 	font-size: var(--font-size-fluid-3);
 	line-height: 1.05;
@@ -42,9 +52,4 @@ li {
 
 input[type='submit'] {
 	margin-block-start: var(--size-2);
-}
-
-form p.error {
-	color: var(--red-7);
-	font-size: var(--font-size-1);
 }

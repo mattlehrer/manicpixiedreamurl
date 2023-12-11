@@ -5,4 +5,9 @@ import sqlite from 'better-sqlite3';
 export const sqliteDatabase = new sqlite('./sqlite.db');
 export const db: BetterSQLite3Database = drizzle(sqliteDatabase);
 
-migrate(db, { migrationsFolder: './drizzle/migrations' });
+console.log('running migrations');
+try {
+	migrate(db, { migrationsFolder: './drizzle/migrations' });
+} catch (error) {
+	console.error(error);
+}

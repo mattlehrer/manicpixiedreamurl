@@ -9,17 +9,19 @@ declare global {
 		// interface PageData {}
 		// interface Platform {}
 	}
-}
 
-/// <reference types="lucia" />
-declare namespace Lucia {
-	type Auth = import('./lib/server/lucia').Auth;
-	type DatabaseUserAttributes = {
-		id: string;
-		email: string;
-		username: string;
-	};
-	type DatabaseSessionAttributes = Record<string, never>;
+	/// <reference types="lucia" />
+	declare global {
+		namespace Lucia {
+			type Auth = import('./lib/server/lucia').Auth;
+			type DatabaseUserAttributes = {
+				id: string;
+				email: string;
+				username: string;
+			};
+			type DatabaseSessionAttributes = Record<string, never>;
+		}
+	}
 }
 
 export {};

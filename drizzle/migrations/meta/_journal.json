@@ -29,6 +29,13 @@
       "when": 1702135570852,
       "tag": "0003_majestic_the_captain",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1702322425760,
+      "tag": "0004_unknown_stone_men",
+      "breakpoints": true
     }
   ]
 }

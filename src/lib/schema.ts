@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { text, sqliteTable, blob, integer, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { createId } from '@paralleldrive/cuid2';
 
@@ -10,6 +10,12 @@ export const user = sqliteTable('user', {
 	updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
 	// other user attributes
 });
+
+export const userRelations = relations(user, ({ many }) => ({
+	domain: many(domain),
+	ideas: many(idea),
+	votes: many(vote),
+}));
 
 export const session = sqliteTable('user_session', {
 	id: text('id').primaryKey(),
@@ -49,10 +55,18 @@ export const domain = sqliteTable(
 	},
 	(table) => {
 		return {
-			nameIdx: uniqueIndex('email_idx').on(table.name),
+			nameIdx: uniqueIndex('name_idx').on(table.name),
 		};
 	},
 );
+
+export const domainRelations = relations(domain, ({ one, many }) => ({
+	owner: one(user, {
+		fields: [domain.ownerId],
+		references: [user.id],
+	}),
+	ideas: many(idea),
+}));
 
 export const idea = sqliteTable('idea', {
 	id: text('id')
@@ -68,6 +82,18 @@ export const idea = sqliteTable('idea', {
 	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const ideaRelations = relations(idea, ({ one, many }) => ({
+	domain: one(domain, {
+		fields: [idea.domainId],
+		references: [domain.id],
+	}),
+	owner: one(user, {
+		fields: [idea.ownerId],
+		references: [user.id],
+	}),
+	votes: many(vote),
+}));
 
 export const vote = sqliteTable(
 	'vote',
@@ -89,3 +115,14 @@ export const vote = sqliteTable(
 		unq: unique('one_vote_per_user_per_idea').on(t.id, t.ideaId, t.userId),
 	}),
 );
+
+export const voteRelations = relations(vote, ({ one }) => ({
+	idea: one(idea, {
+		fields: [vote.ideaId],
+		references: [idea.id],
+	}),
+	user: one(user, {
+		fields: [vote.userId],
+		references: [user.id],
+	}),
+}));

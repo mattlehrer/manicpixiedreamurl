@@ -48,7 +48,7 @@ export const domain = sqliteTable(
 		ownerId: text('owner_id')
 			.notNull()
 			.references(() => user.id),
-		reason: text('reason').notNull(),
+		reason: text('reason').notNull().default(''),
 		isActive: integer('is_active', { mode: 'boolean' }),
 		createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),

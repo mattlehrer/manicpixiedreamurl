@@ -1,0 +1,1 @@
+ALTER TABLE user ADD `has_verified_email` integer DEFAULT false;

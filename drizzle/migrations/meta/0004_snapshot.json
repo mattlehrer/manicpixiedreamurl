@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "5fd1c4ac-6082-49d1-aba7-14ec83aef7d4",
+  "id": "62b4e9d2-3ef1-494d-9046-444020e19356",
   "prevId": "428a973d-27a8-44a0-a1d7-cea70c8d2c7e",
   "tables": {
     "domain": {
@@ -292,6 +292,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "has_verified_email": {
+          "name": "has_verified_email",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
         },
         "created_at": {
           "name": "created_at",

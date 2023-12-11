@@ -6,6 +6,7 @@ export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
 	email: text('email').notNull().unique(),
 	username: text('username').notNull().unique(),
+	hasVerifiedEmail: integer('has_verified_email', { mode: 'boolean' }).default(false),
 	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
 	// other user attributes

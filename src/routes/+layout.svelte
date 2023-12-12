@@ -1,7 +1,4 @@
 <script lang="ts">
-	import 'open-props/style';
-	import 'open-props/normalize';
-	import 'open-props/buttons';
 	import '../app.css';
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';

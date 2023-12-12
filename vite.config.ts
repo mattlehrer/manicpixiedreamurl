@@ -1,5 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
+import postcssCustomMedia from 'postcss-custom-media';
 // import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
@@ -14,5 +15,10 @@ export default defineConfig({
 	],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
+	},
+	css: {
+		postcss: {
+			plugins: [postcssCustomMedia],
+		},
 	},
 });

@@ -6,13 +6,13 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import type { LayoutData } from './$types';
-	import { dashboardSite } from '$lib/config';
+	import { dashboardSites } from '$lib/config';
 	import NetworkSite from '$lib/components/NetworkSite.svelte';
 
 	export let data: LayoutData;
 </script>
 
-{#if data.origin === dashboardSite}
+{#if data.origin && dashboardSites.includes(data.origin)}
 	<div>
 		<Header username={data.username} />
 

@@ -1,10 +1,10 @@
-import { dashboardSite } from '$lib/config';
+import { dashboardSites } from '$lib/config';
 import { error, redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { getDomainByName } from '$lib/server/handlers';
 
 export const load: LayoutServerLoad = async ({ locals, url }) => {
-	if (url.origin !== dashboardSite) {
+	if (!dashboardSites.includes(url.origin)) {
 		if (!['/'].includes(url.pathname)) {
 			throw redirect(303, '/');
 		}

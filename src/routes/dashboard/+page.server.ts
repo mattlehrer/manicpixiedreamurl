@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	// TODO: check dns for each domain
 	// https://nodejs.org/api/dns.html
+	// and stream the results
 
 	return {
 		userId: session.user.userId,

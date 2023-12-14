@@ -58,84 +58,88 @@
 <hr />
 
 <h2>Domains</h2>
-<p>You are currently using {data.domains.length} out of {data.maxDomains} domains on your current plan.</p>
-<table id="domains-table">
-	<thead>
-		<tr>
-			<th>Domain</th>
-			<th class="wider">Reason</th>
-			<!-- <th>Remove</th> -->
-		</tr>
-	</thead>
-	<tbody>
-		{#each data.domains as domain}
+{#if data.domains.length === 0}
+	<p>You don't have any domains yet. Add one above.</p>
+{:else}
+	<p>You are currently using {data.domains.length} out of {data.maxDomains} domains on your current plan.</p>
+	<table id="domains-table">
+		<thead>
 			<tr>
-				<td>
-					<a href="https://{domain.name}">{domain.name}</a>
-				</td>
+				<th>Domain</th>
+				<th class="wider">Reason</th>
+				<!-- <th>Remove</th> -->
+			</tr>
+		</thead>
+		<tbody>
+			{#each data.domains as domain}
+				<tr>
+					<td>
+						<a href="https://{domain.name}">{domain.name}</a>
+					</td>
 
-				<td class="wider">
-					<textarea
-						name="{domain.name}-reason"
-						rows="3"
-						bind:value={domain.reason}
-						onchange={() => updateReason(domain.id, domain.reason)}
-					/>
-					{#if updating[domain.id] === 'updating'}
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							style="color: var(--text-2);"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg
-						>
-						<span class="sr-only">Updating...</span>
-					{:else if updating[domain.id] === 'error'}
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							style="color: var(--red-8);"
-							><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg
-						>
-						<span class="sr-only">Error</span>
-					{:else if updating[domain.id] === 'updated'}
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							style="color: var(--green-7);"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg
-						>
-						<span class="sr-only">Updated</span>
-					{/if}
-				</td>
-				<!-- <td>
+					<td class="wider">
+						<textarea
+							name="{domain.name}-reason"
+							rows="3"
+							bind:value={domain.reason}
+							onchange={() => updateReason(domain.id, domain.reason)}
+						/>
+						{#if updating[domain.id] === 'updating'}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								style="color: var(--text-2);"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg
+							>
+							<span class="sr-only">Updating...</span>
+						{:else if updating[domain.id] === 'error'}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								style="color: var(--red-8);"
+								><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg
+							>
+							<span class="sr-only">Error</span>
+						{:else if updating[domain.id] === 'updated'}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								style="color: var(--green-7);"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg
+							>
+							<span class="sr-only">Updated</span>
+						{/if}
+					</td>
+					<!-- <td>
 					<form method="post" action="?/removeDomain" use:enhance>
 						<input type="hidden" name="domain" value={domain.name} />
 						<input type="submit" value="Remove" />
 					</form>
 				</td> -->
-			</tr>
-		{/each}
-	</tbody>
-</table>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+{/if}
 
 <style lang="postcss">
 	label {

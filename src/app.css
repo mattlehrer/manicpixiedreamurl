@@ -91,15 +91,12 @@ td input ~ svg {
 	border-width: 0;
 }
 
-.wider {
-	@media (--md-n-above) {
-		max-width: 90%;
+@media (--md-n-above) {
+	table#domains-table {
+		max-width: 70ch;
 	}
 
-	& textarea {
-		@media (--md-n-above) {
-			max-width: 90%;
-			min-width: 30ch;
-		}
+	table#domains-table :is(th:first-child, td:first-child, td.wider) {
+		padding-inline: var(--size-3);
 	}
 }

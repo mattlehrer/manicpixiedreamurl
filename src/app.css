@@ -8,6 +8,15 @@ body {
 	height: 100dvh;
 }
 
+.logo {
+	height: var(--size-10);
+	color: var(--text-1);
+
+	@media (--md-n-above) {
+		height: var(--size-11);
+	}
+}
+
 form {
 	display: flex;
 	flex-direction: column;
@@ -61,4 +70,36 @@ li {
 
 input[type='submit'] {
 	margin-block-start: var(--size-2);
+}
+
+td input ~ svg {
+	display: inline-block;
+	animation:
+		1s var(--animation-fade-in) forwards,
+		6s var(--animation-fade-out) forwards;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.wider {
+	@media (--md-n-above) {
+		max-width: 90%;
+	}
+
+	& textarea {
+		@media (--md-n-above) {
+			max-width: 90%;
+			min-width: 30ch;
+		}
+	}
 }

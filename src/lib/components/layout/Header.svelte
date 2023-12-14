@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Logo from '$lib/assets/mpdu_logo.svelte';
 
 	export let username: string;
 </script>
 
 <header>
 	<nav>
-		<a href="/">MPDU</a>
+		<a href="/"><Logo /></a>
 		{#if username}
 			<div>
 				<a href="/dashboard">Dashboard</a>
@@ -49,6 +50,7 @@
 	}
 
 	nav > a {
+		color: var(--text-1);
 		font-size: var(--size-6);
 		font-weight: bold;
 	}

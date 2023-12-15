@@ -3,6 +3,7 @@
 	import DomainReason from '$lib/components/DomainReason.svelte';
 	import { fade } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
+	import { dev } from '$app/environment';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -74,7 +75,7 @@
 			{#each data.domains as domain}
 				<tr>
 					<td>
-						<a href="https://{domain.name}">{domain.name}</a>
+						<a href="//{domain.name}{dev ? ':5173' : ''}">{domain.name}</a>
 					</td>
 
 					<td class="wider">
@@ -184,5 +185,12 @@
 		border-radius: var(--radius-3);
 		margin-block-start: var(--size-2);
 		margin-inline-start: calc(-1 * var(--size-4));
+	}
+
+	td textarea ~ svg {
+		display: inline-block;
+		animation:
+			1s var(--animation-fade-in) forwards,
+			6s var(--animation-fade-out) forwards;
 	}
 </style>

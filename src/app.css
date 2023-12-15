@@ -72,13 +72,6 @@ input[type='submit'] {
 	margin-block-start: var(--size-2);
 }
 
-td input ~ svg {
-	display: inline-block;
-	animation:
-		1s var(--animation-fade-in) forwards,
-		6s var(--animation-fade-out) forwards;
-}
-
 .sr-only {
 	position: absolute;
 	width: 1px;

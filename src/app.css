@@ -14,6 +14,7 @@ body {
 
 	@media (--md-n-above) {
 		height: var(--size-11);
+		width: auto;
 	}
 }
 

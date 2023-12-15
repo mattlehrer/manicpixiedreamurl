@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 157 210">
+<svg class="logo" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 157 210">
 	<path
 		stroke="currentColor"
 		stroke-linecap="round"

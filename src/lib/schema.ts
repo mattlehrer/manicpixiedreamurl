@@ -51,6 +51,8 @@ export const domain = sqliteTable(
 			.references(() => user.id),
 		reason: text('reason').notNull().default(''),
 		isActive: integer('is_active', { mode: 'boolean' }),
+		isDNSVerified: integer('is_dns_verified', { mode: 'boolean' }).default(false),
+		askingPrice: integer('asking_price'),
 		createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
 	},
@@ -102,7 +104,7 @@ export const vote = sqliteTable(
 		id: text('id')
 			.primaryKey()
 			.$defaultFn(() => createId()),
-		type: text('text', { enum: ['up', 'down'] }),
+		type: integer('type', { mode: 'number' }).notNull(), // +1, -1, 0 (or deleted?)
 		ideaId: text('idea_id')
 			.notNull()
 			.references(() => idea.id),
@@ -113,7 +115,7 @@ export const vote = sqliteTable(
 		updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
 	},
 	(t) => ({
-		unq: unique('one_vote_per_user_per_idea').on(t.id, t.ideaId, t.userId),
+		unq: unique('one_vote_per_user_per_idea').on(t.ideaId, t.userId),
 	}),
 );
 

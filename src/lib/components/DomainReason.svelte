@@ -3,7 +3,7 @@
 	export let reason: string;
 </script>
 
-<p>{username} bought this domain because {reason}</p>
+<p>{username} bought this domain {reason ? `because ${reason}` : `and we don't know why yet.`}</p>
 
 <style>
 	p {

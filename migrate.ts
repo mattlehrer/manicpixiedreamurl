@@ -4,13 +4,17 @@ import sqlite from 'better-sqlite3';
 import { dev } from '$app/environment';
 
 console.log('Running migrations...');
-const sqlitePath = new URL(dev ? '' : '../../../' + './sqlite.db', import.meta.url).pathname;
+const workingDirArray = new URL(dev ? '' : '../../../', import.meta.url).pathname.split('/');
+workingDirArray.pop();
+const workingDir = workingDirArray.join('/');
+const sqlitePath = workingDir + '/sqlite.db';
 console.log({ sqlitePath });
 const sqliteDatabase = new sqlite(sqlitePath);
 const db: BetterSQLite3Database = drizzle(sqliteDatabase);
 
 try {
-	const migrationsPath = new URL(dev ? '' : '../../..' + './drizzle/migrations', import.meta.url).pathname;
+	const migrationsPath = workingDir + '/drizzle/migrations';
+	console.log({ migrationsPath });
 	migrate(db, { migrationsFolder: migrationsPath });
 } catch (error) {
 	console.error(error);

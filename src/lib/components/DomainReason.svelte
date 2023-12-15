@@ -7,6 +7,6 @@
 
 <style>
 	p {
-		margin-block-start: 0;
+		margin-block-start: var(--size-3);
 	}
 </style>

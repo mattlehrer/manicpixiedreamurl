@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 
 		if (!domainData) {
 			console.error(`Domain not found: ${url.hostname}`);
-			throw error(404, 'Domain not found');
+			throw error(404, 'Not found');
 		}
 
 		return {

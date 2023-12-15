@@ -9,7 +9,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		return new Response('', { status: 400 });
 	}
 
-	if (toCheck.endsWith('manicpixiedreamurl.com')) {
+	if (['manicpixiedreamurl.com', 'www.manicpixiedreamurl.com'].includes(toCheck)) {
 		return new Response('', { status: 200 });
 	}
 

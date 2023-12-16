@@ -12,7 +12,8 @@ export const getDomainsForUser = (ownerId: string) => {
 	return db.select().from(domain).where(eq(domain.ownerId, ownerId));
 };
 
-export const getDomainByName = async (name: string) => {
+export const getDomainByName = async (input: string) => {
+	const name = input.toLowerCase().replace(/^www\./, '');
 	return db.query.domain.findFirst({
 		where: (domain, { and, eq }) => and(eq(domain.name, name), eq(domain.isActive, true)),
 		columns: {

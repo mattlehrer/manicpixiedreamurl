@@ -156,7 +156,7 @@
 		width: 100%;
 	}
 
-	td > form {
+	td > textarea {
 		padding: 0;
 		margin: 0;
 	}

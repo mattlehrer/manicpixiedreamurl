@@ -5,7 +5,7 @@ import type { PageServerLoad, Actions } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth?.validate();
-	if (session) throw redirect(302, '/');
+	if (session) redirect(302, '/');
 	return {};
 };
 
@@ -45,6 +45,6 @@ export const actions: Actions = {
 				serverError: true,
 			});
 		}
-		throw redirect(302, '/dashboard');
+		redirect(302, '/dashboard');
 	},
 };

@@ -6,14 +6,14 @@ import { getDomainByName } from '$lib/server/handlers';
 export const load: LayoutServerLoad = async ({ locals, url }) => {
 	if (!dashboardSites.includes(url.origin)) {
 		if (!['/'].includes(url.pathname)) {
-			throw redirect(303, '/');
+			redirect(303, '/');
 		}
 
 		const domainData = await getDomainByName(url.hostname);
 
 		if (!domainData) {
 			console.error(`Domain not found: ${url.hostname}`);
-			throw error(404, 'Not found');
+			error(404, 'Not found');
 		}
 
 		return {

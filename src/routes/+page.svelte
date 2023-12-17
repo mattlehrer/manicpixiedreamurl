@@ -30,14 +30,6 @@
 		color: var(--pink-6);
 	}
 
-	p > a {
-		color: var(--pink-6);
-		font-weight: var(--font-weight-8);
-		text-decoration: wavy underline;
-		text-underline-offset: 0.3rem;
-		text-decoration-skip-ink: none;
-	}
-
 	.cta {
 		font-size: var(--font-size-5);
 	}

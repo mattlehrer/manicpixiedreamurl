@@ -18,6 +18,36 @@ body {
 	}
 }
 
+p > a,
+li > a {
+	color: var(--pink-6);
+}
+
+p > a {
+	font-weight: var(--font-weight-8);
+	text-decoration: wavy underline;
+	text-underline-offset: 0.3rem;
+	text-decoration-skip-ink: none;
+}
+
+li > a {
+	text-decoration: underline;
+}
+
+p > a:hover {
+	color: var(--pink-8);
+}
+
+@media (--OSdark) {
+	p > a:hover {
+		color: var(--pink-4);
+	}
+}
+
+.mono {
+	font-family: var(--font-mono);
+}
+
 form {
 	display: flex;
 	flex-direction: column;

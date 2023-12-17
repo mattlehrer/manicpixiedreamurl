@@ -66,6 +66,11 @@
 		<p>You don't have any domains yet. Add one above.</p>
 	{:else}
 		<p>You are currently using {domains.length} out of {data.maxDomains} domains on your current plan.</p>
+		<p class="instructions">
+			To connect your domains to Manic Pixie Dream URL, you'll need to make a couple quick changes to the DNS settings.
+			Point <strong>A records</strong> for the <strong>bare domain</strong> and the <strong>www. subdomain</strong> to
+			<span class="mono">95.217.212.108</span>. More <a href="/domain-instructions">detailed instructions</a> are also available.
+		</p>
 		<table id="domains-table">
 			<thead>
 				<tr>
@@ -147,12 +152,17 @@
 {/await}
 
 <style lang="postcss">
+	.instructions {
+		font-weight: var(--font-weight-3);
+		font-size: var(--font-size-3);
+	}
+
 	label {
 		display: block;
 		margin-block-start: var(--size-2);
 	}
 	table {
-		margin-block-start: var(--size-5);
+		margin-block-start: var(--size-6);
 		width: 100%;
 	}
 

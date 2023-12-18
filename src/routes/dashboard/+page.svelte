@@ -2,17 +2,27 @@
 	import { enhance } from '$app/forms';
 	import DomainReason from '$lib/components/DomainReason.svelte';
 	import { fade } from 'svelte/transition';
-	import type { ActionData, PageData } from './$types';
 	import { dev } from '$app/environment';
 	import { aRecord } from '$lib/config';
 
-	export let data: PageData;
-	export let form: ActionData;
+	let { data, form } = $props();
 
-	let reason: string = form ? String(form?.reason) : '';
-	let domain: string = form ? String(form?.domain) : '';
+	let reason: string = $state(form ? String(form?.reason) : '');
+	let domain: string = $state(form ? String(form?.domain) : '');
 
 	let updating: Record<string, 'updating' | 'updated' | 'error'> = {};
+	let dnsData = $state<{ [id: string]: { bareDns: boolean; wwwDns: boolean } }>({});
+
+	$effect(() => {
+		data.dnsData.then((d) => {
+			d.forEach(async (entry) => {
+				const { id, bareDnsPromise, wwwDnsPromise } = entry;
+				const bareDns = (await bareDnsPromise).address === aRecord;
+				const wwwDns = (await wwwDnsPromise).address === aRecord;
+				dnsData[id] = { bareDns, wwwDns };
+			});
+		});
+	});
 
 	async function updateReason(domainId: string, domainReason: string) {
 		updating[domainId] = 'updating';
@@ -67,15 +77,73 @@
 		<p>You don't have any domains yet. Add one above.</p>
 	{:else}
 		<p>You are currently using {domains.length} out of {data.maxDomains} domains on your current plan.</p>
-		<p class="instructions">
-			To connect your domains to Manic Pixie Dream URL, you'll need to make a couple quick changes to the DNS settings.
-			Point <strong>A records</strong> for the <strong>bare domain</strong> and the <strong>www. subdomain</strong> to
-			<span class="mono">{aRecord}</span>. More <a href="/domain-instructions">detailed instructions</a> are also available.
-		</p>
+		{#if Object.entries(dnsData ?? {}).some(([, { bareDns, wwwDns }]) => !(bareDns && wwwDns))}
+			<p class="instructions">
+				{#if Object.entries(dnsData ?? {}).some(([, { bareDns, wwwDns }]) => bareDns || wwwDns) && !Object.entries(dnsData ?? {}).every(([, { bareDns, wwwDns }]) => bareDns && wwwDns)}
+					You have some more DNS configuration to do. To connect your remaining domains,
+				{:else}
+					To connect your domains to Manic Pixie Dream URL,
+				{/if}
+				you'll need to make a couple quick changes to the DNS settings. Point <strong>A records</strong> for the
+				<strong>bare domain</strong>
+				and the
+				<strong>www. subdomain</strong>
+				to
+				<span class="mono">{aRecord}</span>. More <a href="/domain-instructions">detailed instructions</a> are also available.
+			</p>
+			<p class="instructions">
+				Below,
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><path stroke="var(--green-5)" d="M18 6 7 17l-5-5" /><path
+						stroke="var(--green-5)"
+						d="m22 10-7.5 7.5L13 16"
+					/></svg
+				>
+				means your DNS is configured correctly.
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><path stroke="var(--green-5)" d="M18 6 7 17l-5-5" /><path
+						stroke="var(--red-5)"
+						d="m22 10-7.5 7.5L13 16"
+					/></svg
+				>
+				means the bare domain is configured correctly but the www. subdomain is not.
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><path stroke="var(--red-5)" d="M18 6 7 17l-5-5" /><path
+						stroke="var(--red-5)"
+						d="m22 10-7.5 7.5L13 16"
+					/></svg
+				> means that both need to be configured.
+			</p>
+		{/if}
 		<table id="domains-table">
 			<thead>
 				<tr>
 					<th>Domain</th>
+					<th class="dns-column">DNS</th>
 					<th class="wider">Reason</th>
 					<!-- <th>Remove</th> -->
 				</tr>
@@ -85,6 +153,30 @@
 					<tr>
 						<td>
 							<a href="//{domain.name}{dev ? ':5173' : ''}">{domain.name}</a>
+						</td>
+						<td class="dns-column">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								><path
+									stroke={dnsData?.[domain.id]?.bareDns ? 'var(--green-5)' : 'var(--red-5)'}
+									d="M18 6 7 17l-5-5"
+								/><path
+									stroke={dnsData?.[domain.id]?.wwwDns ? 'var(--green-5)' : 'var(--red-5)'}
+									d="m22 10-7.5 7.5L13 16"
+								/></svg
+							>
+							<p class="sr-only">
+								DNS configuration {Object.entries(dnsData ?? {}).some(([, { bareDns, wwwDns }]) => !(bareDns && wwwDns))
+									? 'is good.'
+									: 'needs work.'}
+							</p>
 						</td>
 
 						<td class="wider">
@@ -158,6 +250,11 @@
 		font-size: var(--font-size-3);
 	}
 
+	.instructions svg {
+		display: inline;
+		margin-bottom: -0.25rem;
+	}
+
 	label {
 		display: block;
 		margin-block-start: var(--size-2);
@@ -177,6 +274,10 @@
 		width: 8rem;
 		text-align: left;
 		padding-inline: var(--size-1);
+	}
+
+	.dns-column {
+		width: 3rem;
 	}
 
 	.wider {

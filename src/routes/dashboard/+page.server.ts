@@ -4,6 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { auth } from '$lib/server/lucia';
 import { getDomainsForUser, insertDomain } from '$lib/server/handlers';
 import { dev } from '$app/environment';
+import { getDNSData } from '$lib/server/dns';
 
 const MAX_DOMAINS = 3;
 
@@ -13,14 +14,18 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const domains = getDomainsForUser(session.user.userId);
 
-	// TODO: check dns for each domain
-	// https://nodejs.org/api/dns.html
-	// and stream the results
-
 	return {
 		userId: session.user.userId,
 		username: session.user.username,
 		domains,
+		dnsData: domains.then((domains) =>
+			domains.map(({ id, name }) => ({
+				id,
+				name,
+				bareDnsPromise: getDNSData(name),
+				wwwDnsPromise: getDNSData(`www.${name}`),
+			})),
+		),
 		maxDomains: MAX_DOMAINS,
 	};
 };

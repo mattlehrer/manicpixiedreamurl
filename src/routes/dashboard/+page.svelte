@@ -4,6 +4,7 @@
 	import { fade } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
 	import { dev } from '$app/environment';
+	import { aRecord } from '$lib/config';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -69,7 +70,7 @@
 		<p class="instructions">
 			To connect your domains to Manic Pixie Dream URL, you'll need to make a couple quick changes to the DNS settings.
 			Point <strong>A records</strong> for the <strong>bare domain</strong> and the <strong>www. subdomain</strong> to
-			<span class="mono">95.217.212.108</span>. More <a href="/domain-instructions">detailed instructions</a> are also available.
+			<span class="mono">{aRecord}</span>. More <a href="/domain-instructions">detailed instructions</a> are also available.
 		</p>
 		<table id="domains-table">
 			<thead>

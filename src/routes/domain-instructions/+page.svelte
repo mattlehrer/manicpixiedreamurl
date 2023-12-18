@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { aRecord } from '$lib/config';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -23,8 +24,8 @@
 		>A records</strong
 	>
 	for the <strong>bare domain</strong> and the <strong>www. subdomain</strong> to
-	<span class="mono">95.217.212.108</span>. The bare domain is also known as the root domain or the apex domain. It's
-	the domain name without any subdomains, like <code>example.com</code>. The www. subdomain is the domain with the www.
+	<span class="mono">{aRecord}</span>. The bare domain is also known as the root domain or the apex domain. It's the
+	domain name without any subdomains, like <code>example.com</code>. The www. subdomain is the domain with the www.
 	prefix, like <code>www.example.com</code>. Most control panels use the "@" symbol (without quotes) to represent the
 	bare domain, some will want you to use the name of the domain there. For the www. subdomain, you'll just enter "www"
 	in the name field.

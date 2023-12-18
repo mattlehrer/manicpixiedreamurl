@@ -5,3 +5,5 @@ export const dashboardSites = dev
 	: ['https://manicpixiedreamurl.com', 'https://www.manicpixiedreamurl.com'];
 
 export const aRecord = dev ? '127.0.0.1' : '95.217.212.108';
+
+export const confirmationEmailAddress = 'support@manicpixiedreamurl.com';

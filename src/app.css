@@ -124,3 +124,11 @@ input[type='submit'] {
 		padding-inline: var(--size-3);
 	}
 }
+
+.notice {
+	padding: var(--size-fluid-1) var(--size-3);
+	background-color: var(--surface-2);
+	border-radius: var(--radius-2);
+	color: var(--text-2);
+	margin-block: var(--size-fluid-2);
+}

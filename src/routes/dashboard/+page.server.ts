@@ -5,6 +5,7 @@ import { auth } from '$lib/server/lucia';
 import { getDomainsForUser, insertDomain } from '$lib/server/handlers';
 import { dev } from '$app/environment';
 import { getDNSData } from '$lib/server/dns';
+import { sendVerificationEmail } from '$lib/server/email';
 
 const MAX_DOMAINS = 3;
 
@@ -17,6 +18,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	return {
 		userId: session.user.userId,
 		username: session.user.username,
+		hasVerifiedEmail: session.user.hasVerifiedEmail,
 		domains,
 		dnsData: domains.then((domains) =>
 			domains.map(({ id, name }) => ({
@@ -64,6 +66,19 @@ export const actions: Actions = {
 		console.log({ inserted });
 
 		return { inserted };
+	},
+	resendVerification: async ({ locals }) => {
+		const session = await locals.auth.validate();
+		if (!session) return fail(401);
+
+		let error;
+		await sendVerificationEmail({ email: session.user.email, id: session.user.userId }).catch((e) => {
+			console.error(e);
+			error = e;
+		});
+		if (error) return fail(500, { verificationError: true });
+
+		return { sent: true };
 	},
 	logout: async ({ locals }) => {
 		const session = await locals.auth.validate();

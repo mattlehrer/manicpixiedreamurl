@@ -1,6 +1,9 @@
 import { relations, sql } from 'drizzle-orm';
 import { text, sqliteTable, blob, integer, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { createId } from '@paralleldrive/cuid2';
+import { uid } from 'uid/secure';
+
+const createVerificationCode = () => uid(64);
 
 export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
@@ -16,6 +19,24 @@ export const userRelations = relations(user, ({ many }) => ({
 	domain: many(domain),
 	ideas: many(idea),
 	votes: many(vote),
+}));
+
+export const emailVerificationCode = sqliteTable('email_verification', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id),
+	code: text('code').$defaultFn(() => createVerificationCode()),
+	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const emailVerificationRelations = relations(emailVerificationCode, ({ one }) => ({
+	user: one(user, {
+		fields: [emailVerificationCode.userId],
+		references: [user.id],
+	}),
 }));
 
 export const session = sqliteTable('user_session', {

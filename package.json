@@ -54,6 +54,8 @@
 		"lucide-svelte": "^0.294.0",
 		"open-props": "^1.6.16",
 		"parse-domain": "^8.0.1",
+		"resend": "^2.0.0",
+		"uid": "^2.0.2",
 		"validator": "^13.11.0"
 	}
 }

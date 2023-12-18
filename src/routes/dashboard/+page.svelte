@@ -43,6 +43,20 @@
 
 <h1>Welcome {data.username}</h1>
 
+{#if !data.hasVerifiedEmail}
+	<div class="notice">
+		{#if form?.verificationError}<p class="error">Something went wrong. Please try again.</p>{/if}
+		{#if form?.sent}
+			<p class="success">Check your email!</p>
+		{:else}
+			<p>You haven't verified your email address yet. Please check your email for a verification link.</p>
+			<form action="?/resendVerification" method="post" use:enhance>
+				<input type="submit" value="Resend verification email" />
+			</form>
+		{/if}
+	</div>
+{/if}
+
 <form action="?/addDomain" method="post" use:enhance>
 	{#if form?.invalid}<p class="error">Please enter a valid domain name.</p>{/if}
 	{#if form?.invalidReason}<p class="error">Please enter a reason you bought the domain.</p>{/if}
@@ -245,6 +259,11 @@
 {/await}
 
 <style lang="postcss">
+	.success {
+		font-size: var(--font-size-3);
+		font-weight: var(--font-weight-3);
+		color: var(--green-6);
+	}
 	.instructions {
 		font-weight: var(--font-weight-3);
 		font-size: var(--font-size-3);

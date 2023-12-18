@@ -18,6 +18,7 @@ declare global {
 				id: string;
 				email: string;
 				username: string;
+				hasVerifiedEmail: boolean;
 			};
 			type DatabaseSessionAttributes = Record<string, never>;
 		}

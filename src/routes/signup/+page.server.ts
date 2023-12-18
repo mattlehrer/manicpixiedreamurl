@@ -3,6 +3,7 @@ import isEmail from 'validator/lib/isEmail';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import Database from 'better-sqlite3';
+import { sendVerificationEmail } from '$lib/server/email';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth?.validate();
@@ -57,6 +58,9 @@ export const actions: Actions = {
 				attributes: {},
 			});
 			locals.auth.setSession(session); // set session cookie
+
+			// send verification email
+			await sendVerificationEmail(user);
 		} catch (e) {
 			console.error(e);
 			if (e instanceof Database.SqliteError && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {

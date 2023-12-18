@@ -32,6 +32,7 @@ export const actions: Actions = {
 				attributes: {},
 			});
 			locals.auth.setSession(session); // set session cookie
+			await auth.deleteDeadUserSessions(key.userId);
 		} catch (e) {
 			console.error(e);
 			if (e instanceof LuciaError && (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')) {

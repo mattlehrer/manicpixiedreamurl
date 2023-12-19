@@ -12,6 +12,8 @@
 	let reason: string = $state(form ? String(form?.reason) : '');
 	let domain: string = $state(form ? String(form?.domain) : '');
 
+	let mightBeAbleToAddDomain = $state(true);
+
 	let updating: Record<string, 'updating' | 'updated' | 'error'> = {};
 
 	async function updateReason(domainId: string, domainReason: string) {
@@ -29,6 +31,15 @@
 			updating[domainId] = 'error';
 		}
 	}
+
+	$effect(() => {
+		if (data.domains.length >= data.maxDomains) {
+			mightBeAbleToAddDomain = false;
+		}
+		if (data.domains.some((d) => !d.bareDNSisVerified || !d.wwwDNSisVerified)) {
+			mightBeAbleToAddDomain = false;
+		}
+	});
 </script>
 
 <h1>Welcome {data.username}</h1>
@@ -49,6 +60,9 @@
 
 {#if data.domains.length}
 	<p>You are currently using {data.domains.length} out of {data.maxDomains} domains on your current plan.</p>
+	{#if data.domains.length < data.maxDomains && data.domains.some((d) => !d.bareDNSisVerified || !d.wwwDNSisVerified)}
+		<p class="notice info">You'll need to verify the domains you've added so far before you can add more.</p>
+	{/if}
 {/if}
 
 <form action="?/addDomain" method="post" use:enhance>
@@ -58,12 +72,13 @@
 			You are currently only allowed {form.tooMany} domains. Paid plans for more domains coming soon.
 		</p>{/if}
 	{#if form?.subdomain}<p class="error">Subdomains are not permitted.</p>{/if}
+	{#if form?.dnsNotVerified}<p class="error">Verify the domains you've already added before adding more.</p>{/if}
 	<label for="domain">Add a domain</label>
 	<input type="text" name="domain" placeholder="example.com" bind:value={domain} />
 	<label for="reason">Add a reason you bought it</label>
 	<input type="text" name="reason" placeholder="" bind:value={reason} />
 
-	<input type="submit" value="Add domain" />
+	<input type="submit" value="Add domain" disabled={!mightBeAbleToAddDomain} />
 </form>
 
 {#if domain.length && reason.length}

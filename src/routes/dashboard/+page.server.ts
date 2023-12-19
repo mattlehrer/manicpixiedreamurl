@@ -31,6 +31,7 @@ export const actions: Actions = {
 		// check if user is allowed to add domains
 		const domains = await getDomainsForUser(session.user.userId);
 		if (domains.length >= MAX_DOMAINS) return fail(400, { tooMany: MAX_DOMAINS });
+		if (!domains.every((d) => d.bareDNSisVerified && d.wwwDNSisVerified)) return fail(400, { dnsNotVerified: true });
 
 		const data = await request.formData();
 		const domain = data.get('domain');

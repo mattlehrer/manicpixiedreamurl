@@ -131,6 +131,13 @@ input[type='submit'] {
 	border-radius: var(--radius-2);
 	color: var(--text-2);
 	margin-block: var(--size-fluid-2);
+	border-inline-start: 3px solid var(--text-2);
+}
+
+.notice.info {
+	background-color: var(--yellow-2);
+	color: var(--gray-10);
+	border-inline-start: 3px solid var(--yellow-8);
 }
 
 svg.spin {

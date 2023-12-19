@@ -132,3 +132,9 @@ input[type='submit'] {
 	color: var(--text-2);
 	margin-block: var(--size-fluid-2);
 }
+
+svg.spin {
+	color: var(--text-2);
+	opacity: 0.85;
+	animation: var(--animation-spin);
+}

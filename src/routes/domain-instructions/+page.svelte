@@ -11,7 +11,7 @@
 	DNS can be tricky. But don't worry. You're only doing this with domains you aren't using. So don't stress too much. If
 	you run into trouble, we'll help you figure it out. It's important to be patient with these changes. It can take as
 	long as two days for the changes to take effect. But most of the time, you'll be able to see it working within a few
-	minutes.
+	minutes. You will need to verify each domain's DNS before you can add more.
 </p>
 <p>
 	To connect your domains to Manic Pixie Dream URL, you'll need to make two changes to the DNS settings for your domain.
@@ -29,6 +29,17 @@
 	prefix, like <code>www.example.com</code>. Most control panels use the "@" symbol (without quotes) to represent the
 	bare domain, some will want you to use the name of the domain there. For the www. subdomain, you'll just enter "www"
 	in the name field.
+</p>
+<p id="cloudflare">
+	If you are using Cloudflare's proxy ("orange cloud"), then we won't be able to tell if DNS is setup correctly. Please
+	verify your domain with orange cloud turned off first. You can do that and it will work if you set the SSL/TLS
+	encryption mode to "Full (strict)." From the Cloudflare dashboard, click on the domain, then click on the SSL/TLS tab
+	(or click on "Overview," the top menu item under SSL/TLS). Then select "Full (strict)." Without that setting, you will
+	probably see the <a href="https://developers.cloudflare.com/ssl/troubleshooting/too-many-redirects/"
+		>ERR_TOO_MANY_REDIRECTS
+	</a>
+	error. More details are in the
+	<a href="https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/">Cloudflare doocumentation</a>.
 </p>
 <p>
 	We wish we could tell you exactly what to look for and where the buttons are, but each company's control panel does

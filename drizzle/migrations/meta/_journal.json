@@ -50,6 +50,13 @@
       "when": 1702934899127,
       "tag": "0006_wet_toad",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1702978697845,
+      "tag": "0007_complex_anthem",
+      "breakpoints": true
     }
   ]
 }

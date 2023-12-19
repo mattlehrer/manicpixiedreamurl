@@ -20,10 +20,14 @@ export const deleteEmailVerificationCode = (code: string) => {
 	return db.delete(emailVerificationCode).where(eq(emailVerificationCode.code, code));
 };
 
-export type NewDomain = typeof domain.$inferInsert;
+export type Domain = typeof domain.$inferInsert;
 
-export const insertDomain = (newDomain: NewDomain) => {
+export const insertDomain = (newDomain: Domain) => {
 	return db.insert(domain).values(newDomain);
+};
+
+export const updateDomain = (domainId: string, data: Partial<Domain>) => {
+	return db.update(domain).set(data).where(eq(domain.id, domainId));
 };
 
 export const getDomainsForUser = (ownerId: string) => {

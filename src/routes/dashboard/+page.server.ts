@@ -4,7 +4,6 @@ import type { Actions, PageServerLoad } from './$types';
 import { auth } from '$lib/server/lucia';
 import { getDomainsForUser, insertDomain } from '$lib/server/handlers';
 import { dev } from '$app/environment';
-import { getDNSData } from '$lib/server/dns';
 import { sendVerificationEmail } from '$lib/server/email';
 
 const MAX_DOMAINS = 3;
@@ -13,21 +12,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth?.validate();
 	if (!session) redirect(302, '/login');
 
-	const domains = getDomainsForUser(session.user.userId);
+	const domains = await getDomainsForUser(session.user.userId);
 
 	return {
 		userId: session.user.userId,
 		username: session.user.username,
 		hasVerifiedEmail: session.user.hasVerifiedEmail,
 		domains,
-		dnsData: domains.then((domains) =>
-			domains.map(({ id, name }) => ({
-				id,
-				name,
-				bareDnsPromise: getDNSData(name),
-				wwwDnsPromise: getDNSData(`www.${name}`),
-			})),
-		),
 		maxDomains: MAX_DOMAINS,
 	};
 };

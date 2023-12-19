@@ -1,5 +1,5 @@
 import { domain, emailVerificationCode, user } from '$lib/schema';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { db } from './db';
 
 export type User = typeof user.$inferSelect;
@@ -14,6 +14,18 @@ export const insertEmailVerificationCode = (userId: string) => {
 
 export const getEmailVerificationCode = (code: string) => {
 	return db.select().from(emailVerificationCode).where(eq(emailVerificationCode.code, code));
+};
+
+export const getAllEmailVerificationCodesForUser = (userId: string) => {
+	return db
+		.select()
+		.from(emailVerificationCode)
+		.where(eq(emailVerificationCode.userId, userId))
+		.orderBy(desc(emailVerificationCode.createdAt));
+};
+
+export const deleteAllEmailVerificationCodesForUser = (userId: string) => {
+	return db.delete(emailVerificationCode).where(eq(emailVerificationCode.userId, userId));
 };
 
 export const deleteEmailVerificationCode = (code: string) => {

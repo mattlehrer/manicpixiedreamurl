@@ -51,6 +51,7 @@ export const getDomainByName = async (input: string) => {
 	return db.query.domain.findFirst({
 		where: (domain, { and, eq }) => and(eq(domain.name, name), eq(domain.isActive, true)),
 		columns: {
+			id: true,
 			name: true,
 			reason: true,
 			isActive: true,
@@ -67,4 +68,17 @@ export const getDomainByName = async (input: string) => {
 
 export const insertIdea = async ({ domainId, ownerId, text }: { domainId: string; ownerId: string; text: string }) => {
 	return db.insert(idea).values({ domainId, ownerId, text });
+};
+
+export const getIdeasWithVotesForDomainId = async (domainId: string) => {
+	return db.query.idea.findMany({
+		where: (idea, { eq }) => eq(idea.domainId, domainId),
+		columns: {
+			id: true,
+			text: true,
+		},
+		with: {
+			votes: true,
+		},
+	});
 };

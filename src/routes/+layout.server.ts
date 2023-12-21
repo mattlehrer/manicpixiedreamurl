@@ -1,7 +1,7 @@
 import { authSessionCookieName, dashboardSites } from '$lib/config';
 import { error, redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { getDomainByName } from '$lib/server/handlers';
+import { getDomainByName, getIdeasWithVotesForDomainId } from '$lib/server/handlers';
 import { sessionTokens } from '$lib/server/session_token';
 import { dev } from '$app/environment';
 
@@ -39,10 +39,13 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			error(404, 'Not found');
 		}
 
+		const ideaData = await getIdeasWithVotesForDomainId(domainData.id);
+
 		return {
 			host: url.host,
 			pathname: url.pathname,
 			domain: domainData,
+			ideas: ideaData,
 		};
 	}
 

@@ -1,36 +1,28 @@
 <script lang="ts">
-	// import { dashboardSites } from '$lib/config';
-
-	// async function submitSuggestion(e) {
-	// 	e.preventDefault();
-	// 	const form = e.target;
-	// 	const formData = new FormData(form);
-
-	// 	const formDataObject = Object.fromEntries(formData.entries());
-	// 	const res = await fetch(`${dashboardSites[0]}/api/network/suggestion`, {
-	// 		method: 'POST',
-	// 		mode: 'cors',
-	// 		credentials: 'include',
-	// 		headers: {
-	// 			'Content-Type': 'application/json',
-	// 			'X-Madeup': 'not-simple',
-	// 		},
-	// 		body: JSON.stringify(formDataObject),
-	// 	}).catch((e) => console.error(e));
-	// 	console.log({ ok: res?.ok });
-	// }
-	let { form } = $props();
+	import { enhance } from '$app/forms';
+	export let ideas: {
+		text: string;
+		id: string;
+		votes: {
+			id: string;
+			type: number;
+			createdAt: string | null;
+			updatedAt: string | null;
+			ideaId: string;
+			userId: string;
+		}[];
+	}[];
 </script>
 
 <ul>
-	<li>Uber for shoes</li>
-	<li>Uber for shoes</li>
-	<li>Uber for shoes</li>
+	{#each ideas ?? [] as idea}
+		<!-- {@const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0)} -->
+		<li>{idea.text}</li>
+	{/each}
 </ul>
 
 <!-- <form id="submit-suggestion" onsubmit={submitSuggestion} method="post"> -->
-<form id="submit-suggestion" action="/network?/addSuggestion" method="post">
-	{#if form?.invalid}<p class="error">Please enter a valid domain name.</p>{/if}
+<form id="submit-suggestion" action="/network?/addSuggestion" method="post" use:enhance>
 	<label for="idea"> What would you build? </label>
 	<input type="text" name="idea" />
 	<input type="submit" />

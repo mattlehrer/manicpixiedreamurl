@@ -5,7 +5,19 @@
 	import Suggestions from './Suggestions.svelte';
 
 	export let host: string;
-	export let domain: { name: string; reason: string; owner: { username: string } };
+	export let domain: { reason: string };
+	export let ideas: {
+		text: string;
+		id: string;
+		votes: {
+			id: string;
+			type: number;
+			createdAt: string | null;
+			updatedAt: string | null;
+			ideaId: string;
+			userId: string;
+		}[];
+	}[];
 </script>
 
 <header class="network">
@@ -17,7 +29,7 @@
 <div class="wrapper">
 	<h1>Welcome to {host}</h1>
 	<DomainReason reason={domain.reason} />
-	<Suggestions />
+	<Suggestions {ideas} />
 
 	<!-- submit idea -->
 </div>

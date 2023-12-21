@@ -1,4 +1,5 @@
-import { fail } from '@sveltejs/kit';
+import { getDomainByName, insertIdea } from '$lib/server/handlers';
+import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async () => {
@@ -6,39 +7,30 @@ export const load = (async () => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	addDomain: async ({ locals, request }) => {
+	addSuggestion: async ({ url, locals, request }) => {
 		const session = await locals.auth.validate();
 		if (!session) return fail(401);
 
-		// // check if user is allowed to add domains
-		// const domains = await getDomainsForUser(session.user.userId);
-		// if (domains.length >= MAX_DOMAINS) return fail(400, { tooMany: MAX_DOMAINS });
-		// if (!domains.every((d) => d.bareDNSisVerified && d.wwwDNSisVerified)) return fail(400, { dnsNotVerified: true });
+		const data = await request.formData();
+		const idea = data.get('idea');
 
-		// const data = await request.formData();
-		// const domain = data.get('domain');
-		// const reason = data.get('reason');
+		const domain = url.hostname;
+		const exists = await getDomainByName(domain);
+		if (!exists) return fail(404, { message: 'Not found' });
+		const domainId = exists.id;
 
-		// if (!domain || typeof domain !== 'string') return fail(400, { domain, invalid: true });
-		// if (!reason || typeof reason !== 'string') return fail(400, { reason, invalidReason: true });
+		console.log({ domainId, idea });
 
-		// // check that this is just a domain name
-		// const parseResult = parseDomain(domain);
-		// console.log({ parseResult });
-		// if (!dev && ![ParseResultType.Listed, ParseResultType.NotListed].includes(parseResult.type))
-		// 	return fail(400, { domain, invalid: true });
+		if (!domainId || typeof domainId !== 'string') error(404, { message: 'Not found' });
+		if (!idea || typeof idea !== 'string') return fail(400, { idea, invalid: true });
 
-		// if (parseResult.type === ParseResultType.Listed && parseResult.subDomains.length)
-		// 	return fail(400, { domain, subdomain: true });
+		const inserted = await insertIdea({
+			ownerId: session.user.userId,
+			domainId,
+			text: idea,
+		});
+		console.log({ inserted });
 
-		// const inserted = await insertDomain({
-		// 	ownerId: session.user.userId,
-		// 	name: domain,
-		// 	reason,
-		// 	isActive: true,
-		// });
-		// console.log({ inserted });
-
-		// return { inserted };
+		return { inserted };
 	},
 };

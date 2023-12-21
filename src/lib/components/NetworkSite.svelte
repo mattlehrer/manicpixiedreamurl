@@ -15,7 +15,7 @@
 
 <div class="wrapper">
 	<h1>Welcome to {host}</h1>
-	<DomainReason reason={domain.reason} username={domain.owner.username} />
+	<DomainReason reason={domain.reason} />
 
 	<!-- submit idea -->
 </div>

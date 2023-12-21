@@ -85,7 +85,7 @@
 	<div transition:fade>
 		<p>On the site, it will look like this:</p>
 		<div class="reason">
-			<DomainReason {reason} username={data.username} />
+			<DomainReason {reason} />
 		</div>
 	</div>
 {/if}

@@ -20,6 +20,9 @@ dependencies:
   drizzle-orm:
     specifier: ^0.29.1
     version: 0.29.1(@types/better-sqlite3@7.6.8)(better-sqlite3@9.2.2)
+  expiry-map:
+    specifier: ^2.0.0
+    version: 2.0.0
   lucia:
     specifier: ^2.7.5
     version: 2.7.5
@@ -2562,6 +2565,13 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
+  /expiry-map@2.0.0:
+    resolution: {integrity: sha512-K1I5wJe2fiqjyUZf/xhxwTpaopw3F+19DsO7Oggl20+3SVTXDIevVRJav0aBMfposQdkl2E4+gnuOKd3j2X0sA==}
+    engines: {node: '>=8'}
+    dependencies:
+      map-age-cleaner: 0.2.0
+    dev: false
+
   /ext@1.7.0:
     resolution: {integrity: sha512-6hxeJYaL110a9b5TEJSj0gojyHQAmA2ch5Os+ySCiA1QGdS697XWY1pzsrSjqA9LDEEgdB/KypIlR59RcLuHYw==}
     dependencies:
@@ -3207,6 +3217,13 @@ packages:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
 
+  /map-age-cleaner@0.2.0:
+    resolution: {integrity: sha512-AvxTC6id0fzSf6OyNBTp1syyCuKO7nOJvHgYlhT0Qkkjvk40zZo+av3ayVgXlxnF/DxEzEfY9mMdd7FHsd+wKQ==}
+    engines: {node: '>=7.6'}
+    dependencies:
+      p-defer: 1.0.0
+    dev: false
+
   /memoizee@0.4.15:
     resolution: {integrity: sha512-UBWmJpLZd5STPm7PMUlOw/TSy972M+z8gcyQ5veOnSDRREz/0bmpyTfKt3/51DhEBqCZQn1udM/5flcSPYhkdQ==}
     dependencies:
@@ -3460,6 +3477,11 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
     dev: true
+
+  /p-defer@1.0.0:
+    resolution: {integrity: sha512-wB3wfAxZpk2AzOfUMJNL+d36xothRSyj8EXOa4f6GMqYDN9BJaaSISbsk+wS9abmnebVw95C2Kb5t85UmpCxuw==}
+    engines: {node: '>=4'}
+    dev: false
 
   /p-limit@3.1.0:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}

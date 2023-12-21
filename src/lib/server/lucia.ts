@@ -3,6 +3,7 @@ import { sveltekit } from 'lucia/middleware';
 import { betterSqlite3 } from '@lucia-auth/adapter-sqlite';
 import { dev } from '$app/environment';
 import { sqliteDatabase } from './db';
+import { authSessionCookieName } from '$lib/config';
 
 export const auth = lucia({
 	env: dev ? 'DEV' : 'PROD',
@@ -13,7 +14,7 @@ export const auth = lucia({
 		session: 'user_session',
 	}),
 	sessionCookie: {
-		name: 'mpdu_session',
+		name: authSessionCookieName,
 		attributes: {
 			sameSite: 'lax',
 			path: '/',

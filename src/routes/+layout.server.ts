@@ -7,9 +7,6 @@ import { dev } from '$app/environment';
 
 export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	if (!dashboardSites.includes(url.origin)) {
-		// if (!['/'].includes(url.pathname)) {
-		// 	redirect(303, '/');
-		// }
 		const sessionCookie = cookies.get(authSessionCookieName);
 		if (!sessionCookie) {
 			const token = url.searchParams.get('token');

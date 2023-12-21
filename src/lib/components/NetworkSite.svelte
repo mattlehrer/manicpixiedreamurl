@@ -2,6 +2,7 @@
 	import MpduLogo from '$lib/assets/mpdu_logo.svelte';
 	import { dashboardSites } from '$lib/config';
 	import DomainReason from './DomainReason.svelte';
+	import Suggestions from './Suggestions.svelte';
 
 	export let host: string;
 	export let domain: { name: string; reason: string; owner: { username: string } };
@@ -16,6 +17,7 @@
 <div class="wrapper">
 	<h1>Welcome to {host}</h1>
 	<DomainReason reason={domain.reason} />
+	<Suggestions />
 
 	<!-- submit idea -->
 </div>

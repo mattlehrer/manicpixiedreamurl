@@ -1,4 +1,4 @@
-import { domain, emailVerificationCode, user } from '$lib/schema';
+import { domain, emailVerificationCode, idea, user } from '$lib/schema';
 import { desc, eq } from 'drizzle-orm';
 import { db } from './db';
 
@@ -63,4 +63,8 @@ export const getDomainByName = async (input: string) => {
 			},
 		},
 	});
+};
+
+export const insertIdea = async ({ domainId, ownerId, text }: { domainId: string; ownerId: string; text: string }) => {
+	return db.insert(idea).values({ domainId, ownerId, text });
 };

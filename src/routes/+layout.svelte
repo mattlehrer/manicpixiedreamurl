@@ -20,7 +20,7 @@
 		<Footer />
 	</div>
 {:else if data.domain !== undefined}
-	<NetworkSite host={data.host} domain={data.domain} ideas={data.ideas} />
+	<NetworkSite host={data.host} domain={data.domain} ideas={data.ideas} newIdea={data.newIdea} />
 {:else}
 	<!-- 404 from +layout.server -->
 {/if}

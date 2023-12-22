@@ -2,15 +2,27 @@ import { auth } from '$lib/server/lucia';
 import { LuciaError } from 'lucia';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { dashboardSites } from '$lib/config';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
 	const session = await locals.auth?.validate();
-	if (session) redirect(302, '/');
+	if (session) {
+		const domain = url.searchParams.get('redirect');
+		if (!domain) {
+			redirect(307, '/dashboard');
+		}
+		const redirectTo = new URL('/check-session', dashboardSites[0]);
+		redirectTo.searchParams.append('redirect', domain);
+		const idea = url.searchParams.get('idea');
+		if (idea) redirectTo.searchParams.append('idea', idea);
+
+		redirect(302, redirectTo.href);
+	}
 	return {};
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request, locals, url }) => {
 		const formData = await request.formData();
 		const username = formData.get('username');
 		const password = formData.get('password');
@@ -46,6 +58,14 @@ export const actions: Actions = {
 				serverError: true,
 			});
 		}
-		redirect(302, '/dashboard');
+
+		const redirectLocation = url.searchParams.get('redirect');
+		console.log({ redirectLocation });
+		const redirectTo = new URL(`${url.protocol}//${redirectLocation}`);
+		const idea = url.searchParams.get('idea');
+		if (idea) redirectTo.searchParams.append('idea', idea);
+
+		if (redirectLocation) redirect(302, redirectTo.href);
+		redirect(307, '/dashboard');
 	},
 };

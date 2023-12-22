@@ -12,6 +12,7 @@
 			userId: string;
 		}[];
 	}[];
+	export let newIdea = '';
 </script>
 
 <ul>
@@ -24,7 +25,7 @@
 <!-- <form id="submit-suggestion" onsubmit={submitSuggestion} method="post"> -->
 <form id="submit-suggestion" action="/network?/addSuggestion" method="post" use:enhance>
 	<label for="idea"> What would you build? </label>
-	<input type="text" name="idea" />
+	<input type="text" name="idea" value={newIdea} />
 	<input type="submit" />
 </form>
 

@@ -1,6 +1,7 @@
 import { getDomainByName, insertIdea } from '$lib/server/handlers';
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { dashboardSites } from '$lib/config';
 
 export const load = (async () => {
 	return {};
@@ -9,10 +10,18 @@ export const load = (async () => {
 export const actions: Actions = {
 	addSuggestion: async ({ url, locals, request }) => {
 		const session = await locals.auth.validate();
-		if (!session) return fail(401);
-
 		const data = await request.formData();
-		const idea = data.get('idea');
+		const idea = data && data.get('idea');
+
+		if (!session) {
+			const redirectTo = new URL('/login', dashboardSites[0]);
+			redirectTo.searchParams.append('redirect', url.host);
+			if (idea && typeof idea === 'string') redirectTo.searchParams.append('idea', idea);
+			redirect(302, redirectTo);
+		}
+
+		// TODO: redirect to dashboard with toast to verify email
+		if (!session.user.hasVerifiedEmail) return fail(403, { message: 'Email not verified' });
 
 		const domain = url.hostname;
 		const exists = await getDomainByName(domain);

@@ -5,6 +5,13 @@ import { getDomainByName, getIdeasWithVotesForDomainId } from '$lib/server/handl
 import { sessionTokens } from '$lib/server/session_token';
 import { dev } from '$app/environment';
 
+const cookieOpts = {
+	path: '/',
+	secure: !dev,
+	sameSite: 'lax',
+	httpOnly: true,
+} as const;
+
 export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	if (!dashboardSites.includes(url.origin)) {
 		const sessionCookie = cookies.get(authSessionCookieName);
@@ -13,21 +20,18 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			if (token) {
 				const session = sessionTokens.get(token);
 				if (session) {
-					cookies.set(authSessionCookieName, session, {
-						path: '/',
-						secure: !dev,
-					});
+					cookies.set(authSessionCookieName, session, cookieOpts);
+					cookies.delete('mpdu_session_checked', cookieOpts);
 					sessionTokens.delete(token);
 				} else {
-					cookies.set('mpdu_session_checked', 'true', {
-						path: '/',
-						secure: !dev,
-					});
+					cookies.set('mpdu_session_checked', 'true', cookieOpts);
 				}
 			} else {
 				const redirectCookie = cookies.get('mpdu_session_checked');
 				if (!redirectCookie) {
-					redirect(302, `${dashboardSites[0]}/check-session?domain=${url.hostname}`);
+					const redirectTo = new URL('/check-session', dashboardSites[0]);
+					redirectTo.searchParams.append('redirect', url.host);
+					redirect(302, redirectTo.href);
 				}
 			}
 		}
@@ -41,11 +45,14 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 
 		const ideaData = await getIdeasWithVotesForDomainId(domainData.id);
 
+		const newIdea = url.searchParams.get('idea') ?? '';
+
 		return {
 			host: url.host,
 			pathname: url.pathname,
 			domain: domainData,
 			ideas: ideaData,
+			newIdea,
 		};
 	}
 

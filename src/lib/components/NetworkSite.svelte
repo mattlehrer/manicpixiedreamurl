@@ -18,6 +18,7 @@
 			userId: string;
 		}[];
 	}[];
+	export let newIdea: string;
 </script>
 
 <header class="network">
@@ -29,7 +30,7 @@
 <div class="wrapper">
 	<h1>Welcome to {host}</h1>
 	<DomainReason reason={domain.reason} />
-	<Suggestions {ideas} />
+	<Suggestions {ideas} {newIdea} />
 
 	<!-- submit idea -->
 </div>

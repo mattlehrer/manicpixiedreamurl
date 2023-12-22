@@ -42,7 +42,6 @@ export const actions: Actions = {
 
 		// check that this is just a domain name
 		const parseResult = parseDomain(domain);
-		console.log({ parseResult });
 		if (!dev && ![ParseResultType.Listed, ParseResultType.NotListed].includes(parseResult.type))
 			return fail(400, { domain, invalid: true });
 
@@ -55,7 +54,6 @@ export const actions: Actions = {
 			reason,
 			isActive: true,
 		});
-		console.log({ inserted });
 
 		return { inserted };
 	},

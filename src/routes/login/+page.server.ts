@@ -59,13 +59,15 @@ export const actions: Actions = {
 			});
 		}
 
+		const redirectTo = new URL('/check-session', dashboardSites[0]);
 		const redirectLocation = url.searchParams.get('redirect');
-		console.log({ redirectLocation });
-		const redirectTo = new URL(`${url.protocol}//${redirectLocation}`);
+		if (!redirectLocation) {
+			redirect(307, '/dashboard');
+		}
+		redirectTo.searchParams.append('redirect', redirectLocation);
 		const idea = url.searchParams.get('idea');
 		if (idea) redirectTo.searchParams.append('idea', idea);
 
-		if (redirectLocation) redirect(302, redirectTo.href);
-		redirect(307, '/dashboard');
+		redirect(302, redirectTo.href);
 	},
 };

@@ -4,15 +4,34 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import Database from 'better-sqlite3';
 import { sendVerificationEmail } from '$lib/server/email';
+import { dashboardSites } from '$lib/config';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
 	const session = await locals.auth?.validate();
-	if (session) redirect(302, '/');
-	return {};
+	if (session) {
+		const domain = url.searchParams.get('redirect');
+		if (!domain) redirect(307, '/');
+		const redirectTo = new URL('/check-session', dashboardSites[0]);
+		redirectTo.searchParams.append('redirect', domain);
+		const idea = url.searchParams.get('idea');
+		if (idea) redirectTo.searchParams.append('idea', idea);
+
+		redirect(302, redirectTo.href);
+	}
+
+	const loginLink = new URL('/login', dashboardSites[0]);
+	const redirectLocation = url.searchParams.get('redirect');
+	if (redirectLocation) loginLink.searchParams.append('redirect', redirectLocation);
+	const idea = url.searchParams.get('idea');
+	if (idea) loginLink.searchParams.append('idea', idea);
+
+	return {
+		loginLink: loginLink.pathname + loginLink.search,
+	};
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request, locals, url }) => {
 		const formData = await request.formData();
 		const username = formData.get('username');
 		const email = formData.get('email');
@@ -40,7 +59,7 @@ export const actions: Actions = {
 			});
 		}
 		try {
-			console.log('creating user');
+			console.debug('creating user');
 			const user = await auth.createUser({
 				key: {
 					providerId: 'username', // auth method
@@ -52,7 +71,7 @@ export const actions: Actions = {
 					username,
 				},
 			});
-			console.log({ user });
+			console.debug({ user });
 			const session = await auth.createSession({
 				userId: user.userId,
 				attributes: {},
@@ -60,7 +79,7 @@ export const actions: Actions = {
 			locals.auth.setSession(session); // set session cookie
 
 			// send verification email
-			await sendVerificationEmail(user);
+			await sendVerificationEmail({ ...user, id: user.userId });
 		} catch (e) {
 			console.error(e);
 			if (e instanceof Database.SqliteError && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -74,6 +93,15 @@ export const actions: Actions = {
 				serverError: true,
 			});
 		}
-		redirect(302, '/dashboard');
+		const redirectTo = new URL('/check-session', dashboardSites[0]);
+		const redirectLocation = url.searchParams.get('redirect');
+		if (!redirectLocation) {
+			redirect(307, '/dashboard');
+		}
+		redirectTo.searchParams.append('redirect', redirectLocation);
+		const idea = url.searchParams.get('idea');
+		if (idea) redirectTo.searchParams.append('idea', idea);
+
+		redirect(302, redirectTo.href);
 	},
 };

@@ -50,7 +50,10 @@
 		{#if form?.sent}
 			<p class="success">Check your email!</p>
 		{:else}
-			<p>You haven't verified your email address yet. Please check your email for a verification link.</p>
+			<p>
+				You haven't verified your email address yet. You'll need to do that before you can submit ideas and vote on
+				them. Please check your email for a verification link.
+			</p>
 			<form action="?/resendVerification" method="post" use:enhance>
 				<input type="submit" value="Resend verification email" />
 			</form>

@@ -32,7 +32,7 @@ export const actions: Actions = {
 		const domainId = exists.id;
 
 		if (!domainId || typeof domainId !== 'string') error(404, { message: 'Not found' });
-		if (!idea || typeof idea !== 'string') return fail(400, { idea, invalid: true });
+		if (!idea || typeof idea !== 'string' || !idea.trim()) return fail(400, { idea, invalid: true });
 
 		const inserted = await insertIdea({
 			ownerId: session.user.userId,

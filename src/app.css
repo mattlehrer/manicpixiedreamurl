@@ -80,10 +80,9 @@ h1 {
 
 h2 {
 	font-size: var(--font-size-fluid-2);
-	color: var(--text-2);
 	line-height: 1.05;
 	margin-block-start: var(--size-1);
-	margin-block-end: var(--size-8);
+	margin-block-end: var(--size-4);
 }
 
 p {

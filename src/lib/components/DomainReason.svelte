@@ -2,10 +2,24 @@
 	export let reason: string;
 </script>
 
-<p>Someone bought this domain {reason ? `because ${reason}` : `and we don't know why yet.`}</p>
+<p class="reason">
+	Someone bought this domain
+	{#if reason}
+		because <span>{reason}</span>.
+	{:else}
+		and we don't know why yet.
+	{/if}
+</p>
 
 <style>
 	p {
-		margin-block-start: var(--size-3);
+		margin-block: var(--size-3);
+		font-size: var(--font-size-fluid-2);
+		line-height: 1.1;
+	}
+
+	span {
+		color: var(--pink-7);
+		font-weight: bold;
 	}
 </style>

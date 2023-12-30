@@ -4,7 +4,6 @@
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import type { LayoutData } from './$types';
 	import { dashboardSites } from '$lib/config';
-	import NetworkSite from '$lib/components/NetworkSite.svelte';
 
 	export let data: LayoutData;
 </script>
@@ -20,7 +19,7 @@
 		<Footer />
 	</div>
 {:else if data.domain !== undefined}
-	<NetworkSite host={data.host} domain={data.domain} ideas={data.ideas} newIdea={data.newIdea} />
+	<slot />
 {:else}
 	<!-- 404 from +layout.server -->
 {/if}

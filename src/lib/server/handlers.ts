@@ -70,6 +70,12 @@ export const insertIdea = async ({ domainId, ownerId, text }: { domainId: string
 	return db.insert(idea).values({ domainId, ownerId, text });
 };
 
+export const getIdeaForDomainByText = async (domainId: string, text: string) => {
+	return db.query.idea.findFirst({
+		where: (idea, { and, eq }) => and(eq(idea.domainId, domainId), eq(idea.text, text)),
+	});
+};
+
 export const getIdeasWithVotesForDomainId = async (domainId: string) => {
 	return db.query.idea.findMany({
 		where: (idea, { eq }) => eq(idea.domainId, domainId),

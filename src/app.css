@@ -122,6 +122,10 @@ input[type='submit'] {
 	table#domains-table :is(th:first-child, td:first-child, td.wider) {
 		padding-inline: var(--size-3);
 	}
+
+	.dash-reason {
+		max-width: max-content;
+	}
 }
 
 .notice {
@@ -136,7 +140,13 @@ input[type='submit'] {
 .notice.info {
 	background-color: var(--yellow-2);
 	color: var(--gray-10);
-	border-inline-start: 3px solid var(--yellow-8);
+	border-color: var(--yellow-8);
+}
+
+.notice.success {
+	background-color: var(--green-0);
+	border-color: var(--green-9);
+	color: var(--green-9);
 }
 
 svg.spin {

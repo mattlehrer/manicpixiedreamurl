@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { confetti } from '@neoconfetti/svelte';
 	import DNSVerification from '$lib/components/DNSVerification.svelte';
 	import { enhance } from '$app/forms';
 	import DomainReason from '$lib/components/DomainReason.svelte';
@@ -8,6 +9,8 @@
 	import { aRecord } from '$lib/config';
 
 	let { data, form } = $props();
+	let innerHeight = $state(500);
+	let innerWidth = $state(500);
 
 	let reason: string = $state(form ? String(form?.reason) : '');
 	let domain: string = $state(form ? String(form?.domain) : '');
@@ -42,13 +45,15 @@
 	});
 </script>
 
+<svelte:window bind:innerWidth bind:innerHeight />
+
 <h1>Welcome {data.username}</h1>
 
 {#if !data.hasVerifiedEmail}
 	<div class="notice">
 		{#if form?.verificationError}<p class="error">Something went wrong. Please try again.</p>{/if}
 		{#if form?.sent}
-			<p class="success">Check your email!</p>
+			<p class="notice success">Check your email!</p>
 		{:else}
 			<p>
 				You haven't verified your email address yet. You'll need to do that before you can submit ideas and vote on
@@ -63,9 +68,32 @@
 
 {#if data.domains.length}
 	<p>You are currently using {data.domains.length} out of {data.maxDomains} domains on your current plan.</p>
-	{#if data.domains.length < data.maxDomains && data.domains.some((d) => !d.bareDNSisVerified || !d.wwwDNSisVerified)}
+	{#if data.domains.length < data.maxDomains && data.domains.some((d) => !d.bareDNSisVerified || !d.wwwDNSisVerified) && !form?.inserted}
 		<p class="notice info">You'll need to verify the domains you've added so far before you can add more.</p>
 	{/if}
+{/if}
+{#if form?.inserted}
+	<p class="notice success">
+		You're on your way! Instructions for setting up the DNS records for your domain are below. You'll need to do that
+		before you can add more domains.
+	</p>
+	<div class="confetti">
+		<div
+			use:confetti={{
+				colors: [
+					'var(--pink-5)',
+					'var(--pink-6)',
+					'var(--pink-7)',
+					'var(--pink-8)',
+					'var(--green-3)',
+					'var(--indigo-8)',
+					'var(--yellow-3)',
+				],
+				stageHeight: innerHeight,
+				stageWidth: innerWidth,
+			}}
+		/>
+	</div>
 {/if}
 
 <form action="?/addDomain" method="post" use:enhance>
@@ -82,12 +110,19 @@
 	<input type="text" name="reason" placeholder="" bind:value={reason} />
 
 	<input type="submit" value="Add domain" disabled={!mightBeAbleToAddDomain} />
+	{#if data.domains.length === 0}
+		<p>
+			After this, the next step will be to add a couple DNS records. If you want, you can <a href="/domain-instructions"
+				>read more about that</a
+			> first.
+		</p>
+	{/if}
 </form>
 
 {#if domain.length && reason.length}
 	<div transition:fade>
 		<p>On the site, it will look like this:</p>
-		<div class="reason">
+		<div class="dash-reason">
 			<DomainReason {reason} />
 		</div>
 	</div>
@@ -236,11 +271,11 @@
 {/if}
 
 <style lang="postcss">
-	.success {
-		font-size: var(--font-size-3);
-		font-weight: var(--font-weight-3);
-		color: var(--green-6);
+	.confetti {
+		display: flex;
+		justify-content: center;
 	}
+
 	.instructions {
 		font-weight: var(--font-weight-3);
 		font-size: var(--font-size-3);
@@ -294,13 +329,13 @@
 		width: 85%;
 	}
 
-	.reason {
+	.dash-reason {
 		background-color: var(--surface-2);
 		padding: var(--size-4);
-		width: max-content;
 		border-radius: var(--radius-3);
 		margin-block-start: var(--size-2);
 		margin-inline-start: calc(-1 * var(--size-4));
+		margin-inline-end: calc(-1 * var(--size-4));
 	}
 
 	td textarea ~ svg:not(.spin) {

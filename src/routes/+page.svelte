@@ -5,9 +5,22 @@
 	import NetworkHeader from '$lib/components/NetworkHeader.svelte';
 	import DomainReason from '$lib/components/DomainReason.svelte';
 	import { enhance } from '$app/forms';
+	import { queryParam, ssp } from 'sveltekit-search-params';
+	import { onMount } from 'svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
+
+	const token = queryParam('token', ssp.string(), {
+		pushHistory: false,
+	});
+
+	onMount(() => {
+		if ($token?.length) {
+			// remove token from url after use
+			$token = null;
+		}
+	});
 </script>
 
 {#if data.origin && dashboardSites.includes(data.origin)}

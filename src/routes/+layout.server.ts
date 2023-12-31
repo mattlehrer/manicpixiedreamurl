@@ -68,5 +68,6 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 		host: url.host,
 		pathname: url.pathname,
 		username: session?.user.username,
+		loggedIn: !!session,
 	};
 };

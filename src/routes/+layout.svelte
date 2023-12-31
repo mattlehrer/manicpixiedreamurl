@@ -14,7 +14,7 @@
 		<script
 			defer
 			event-site={data.host}
-			event-logged_in={data.loggedIn || data.username !== undefined}
+			event-logged_in={data.loggedIn}
 			data-domain="manicpixiedreamurl.com"
 			src="/js/script.js"
 		></script>

@@ -15,6 +15,7 @@ const cookieOpts = {
 export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	if (!dashboardSites.includes(url.origin)) {
 		const sessionCookie = cookies.get(authSessionCookieName);
+		let loggedIn = false;
 		if (!sessionCookie) {
 			const token = url.searchParams.get('token');
 			if (token) {
@@ -23,6 +24,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 					cookies.set(authSessionCookieName, session, cookieOpts);
 					cookies.delete('mpdu_session_checked', cookieOpts);
 					sessionTokens.delete(token);
+					loggedIn = true;
 				} else {
 					cookies.set('mpdu_session_checked', 'true', cookieOpts);
 				}
@@ -34,6 +36,8 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 					redirect(302, redirectTo.href);
 				}
 			}
+		} else {
+			loggedIn = true;
 		}
 
 		const domainData = await getDomainByName(url.hostname);
@@ -53,6 +57,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			domain: domainData,
 			ideas: ideaData,
 			newIdea,
+			loggedIn,
 		};
 	}
 

@@ -4,9 +4,22 @@
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import type { LayoutData } from './$types';
 	import { dashboardSites } from '$lib/config';
+	import { dev } from '$app/environment';
 
 	export let data: LayoutData;
 </script>
+
+<svelte:head>
+	{#if !dev}
+		<script
+			defer
+			event-site={data.host}
+			event-logged_in={data.loggedIn || data.username !== undefined}
+			data-domain="manicpixiedreamurl.com"
+			src="/js/script.js"
+		></script>
+	{/if}
+</svelte:head>
 
 {#if data.origin && dashboardSites.includes(data.origin)}
 	<div>

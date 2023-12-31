@@ -1,4 +1,11 @@
-import { getDomainByName, getIdeaForDomainByText, insertIdea } from '$lib/server/handlers';
+import {
+	getDomainByName,
+	getIdeaForDomainByText,
+	insertDownVote,
+	insertIdea,
+	insertUpVote,
+	removeVote,
+} from '$lib/server/handlers';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { dashboardSites } from '$lib/config';
@@ -39,6 +46,78 @@ export const actions: Actions = {
 			ownerId: session.user.userId,
 			domainId,
 			text: newIdea,
+		});
+
+		return { inserted };
+	},
+	downvote: async ({ url, locals, request }) => {
+		const session = await locals.auth.validate();
+		const data = await request.formData();
+		const ideaId = data && data.get('idea');
+
+		if (!session) {
+			const redirectTo = new URL('/signup', dashboardSites[0]);
+			redirectTo.searchParams.append('redirect', url.host);
+			redirect(302, redirectTo);
+		}
+
+		if (!session.user.hasVerifiedEmail) {
+			const redirectTo = new URL('/dashboard', dashboardSites[0]);
+			return redirect(302, redirectTo);
+		}
+
+		if (!ideaId || typeof ideaId !== 'string') return fail(400, { message: 'Invalid request' });
+
+		const inserted = await insertDownVote({
+			userId: session.user.userId,
+			ideaId,
+		});
+
+		return { inserted };
+	},
+	upvote: async ({ url, locals, request }) => {
+		const session = await locals.auth.validate();
+		const data = await request.formData();
+		const ideaId = data && data.get('idea');
+
+		if (!session) {
+			console.log({ redirecting: true, session });
+			const redirectTo = new URL('/signup', dashboardSites[0]);
+			redirectTo.searchParams.append('redirect', url.host);
+			redirect(302, redirectTo);
+		}
+
+		if (!session.user.hasVerifiedEmail) {
+			const redirectTo = new URL('/dashboard', dashboardSites[0]);
+			return redirect(302, redirectTo);
+		}
+
+		if (!ideaId || typeof ideaId !== 'string') return fail(400, { message: 'Invalid request' });
+
+		const inserted = await insertUpVote({
+			userId: session.user.userId,
+			ideaId,
+		});
+
+		return { inserted };
+	},
+	unvote: async ({ url, locals, request }) => {
+		const session = await locals.auth.validate();
+		const data = await request.formData();
+		const ideaId = data && data.get('idea');
+
+		if (!session) {
+			console.log({ redirecting: true, session });
+			const redirectTo = new URL('/signup', dashboardSites[0]);
+			redirectTo.searchParams.append('redirect', url.host);
+			redirect(302, redirectTo);
+		}
+
+		if (!ideaId || typeof ideaId !== 'string') return fail(400, { message: 'Invalid request' });
+
+		const inserted = await removeVote({
+			userId: session.user.userId,
+			ideaId,
 		});
 
 		return { inserted };

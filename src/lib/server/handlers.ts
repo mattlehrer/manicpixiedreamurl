@@ -1,5 +1,5 @@
-import { domain, emailVerificationCode, idea, user } from '$lib/schema';
-import { desc, eq } from 'drizzle-orm';
+import { domain, emailVerificationCode, idea, user, vote } from '$lib/schema';
+import { desc, eq, sql } from 'drizzle-orm';
 import { db } from './db';
 
 export type User = typeof user.$inferSelect;
@@ -80,4 +80,25 @@ export const getIdeasWithVotesForDomainId = async (domainId: string) => {
 			votes: true,
 		},
 	});
+};
+
+export const insertUpVote = async ({ ideaId, userId }: { ideaId: string; userId: string }) => {
+	return db
+		.insert(vote)
+		.values({ ideaId, userId, type: 1 })
+		.onConflictDoUpdate({ target: [vote.ideaId, vote.userId], set: { type: 1, updatedAt: sql`CURRENT_TIMESTAMP` } });
+};
+
+export const insertDownVote = async ({ ideaId, userId }: { ideaId: string; userId: string }) => {
+	return db
+		.insert(vote)
+		.values({ ideaId, userId, type: -1 })
+		.onConflictDoUpdate({ target: [vote.ideaId, vote.userId], set: { type: -1, updatedAt: sql`CURRENT_TIMESTAMP` } });
+};
+
+export const removeVote = async ({ ideaId, userId }: { ideaId: string; userId: string }) => {
+	return db
+		.insert(vote)
+		.values({ ideaId, userId, type: 0 })
+		.onConflictDoUpdate({ target: [vote.ideaId, vote.userId], set: { type: 0, updatedAt: sql`CURRENT_TIMESTAMP` } });
 };

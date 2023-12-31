@@ -4,6 +4,7 @@ import type { LayoutServerLoad } from './$types';
 import { getDomainByName, getIdeasWithVotesForDomainId } from '$lib/server/handlers';
 import { sessionTokens } from '$lib/server/session_token';
 import { dev } from '$app/environment';
+import { auth } from '$lib/server/lucia';
 
 const cookieOpts = {
 	path: '/',
@@ -16,15 +17,18 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	if (!dashboardSites.includes(url.origin)) {
 		const sessionCookie = cookies.get(authSessionCookieName);
 		let loggedIn = false;
+		let userId: string | undefined = undefined;
 		if (!sessionCookie) {
 			const token = url.searchParams.get('token');
 			if (token) {
-				const session = sessionTokens.get(token);
-				if (session) {
-					cookies.set(authSessionCookieName, session, cookieOpts);
+				const sessionId = sessionTokens.get(token);
+				if (sessionId) {
+					cookies.set(authSessionCookieName, sessionId, cookieOpts);
 					cookies.delete('mpdu_session_checked', cookieOpts);
 					sessionTokens.delete(token);
 					loggedIn = true;
+					const session = await auth.getSession(sessionId);
+					userId = session?.user.userId;
 				} else {
 					cookies.set('mpdu_session_checked', 'true', cookieOpts);
 				}
@@ -38,6 +42,8 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			}
 		} else {
 			loggedIn = true;
+			const session = await locals.auth.validate();
+			userId = session?.user.userId;
 		}
 
 		const domainData = await getDomainByName(url.hostname);
@@ -47,7 +53,13 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			error(404, 'Not found');
 		}
 
-		const ideaData = await getIdeasWithVotesForDomainId(domainData.id);
+		const ideaData = (await getIdeasWithVotesForDomainId(domainData.id)).map((idea) => ({
+			...idea,
+			votes: idea.votes.map((vote) => ({
+				...vote,
+				userId: vote.userId === userId ? userId : undefined,
+			})),
+		}));
 
 		const newIdea = url.searchParams.get('idea') ?? '';
 
@@ -58,6 +70,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			ideas: ideaData,
 			newIdea,
 			loggedIn,
+			userId,
 		};
 	}
 

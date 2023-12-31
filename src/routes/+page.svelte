@@ -35,8 +35,26 @@
 			<h3>Vote on the best ideas so far:</h3>
 			<ul>
 				{#each data.ideas ?? [] as idea}
-					<!-- {@const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0)} -->
-					<li>{idea.text}</li>
+					{@const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0)}
+					{@const existingVote = idea.votes.find((vote) => vote.userId === data.userId)}
+					<li>
+						<form class="vote" method="post" use:enhance>
+							<input type="hidden" name="idea" value={idea.id} />
+							<button
+								class:voted={existingVote?.type === 1}
+								formaction={existingVote?.type === 1 ? '?/unvote' : '?/upvote'}>^</button
+							>
+							<span style={`margin-left: ${score < 0 ? '-1ch' : '0'}`}>{score}</span>
+							<button
+								class="flip"
+								class:voted={existingVote?.type === -1}
+								formaction={existingVote?.type === -1 ? '?/unvote' : '?/downvote'}>^</button
+							>
+						</form>
+						<span>
+							{idea.text}
+						</span>
+					</li>
 				{/each}
 			</ul>
 
@@ -109,9 +127,55 @@
 
 	ul {
 		padding: var(--size-fluid-2) var(--size-fluid-4);
+		list-style: none;
+		padding-inline: 0;
 	}
 
-	li:first-child {
+	li {
+		display: flex;
+		align-items: center;
+		gap: var(--size-fluid-2);
 		margin-block-start: 0;
+		margin-block-end: var(--size-fluid-1);
+	}
+
+	.vote {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		color: var(--text-2);
+		font-family: var(--font-mono);
+		font-variant-numeric: tabular-nums;
+		font-size: var(--font-size-2);
+		align-items: center;
+		line-height: 1;
+		margin: 0;
+	}
+
+	.vote button {
+		background: none;
+		border: none;
+		padding: 0;
+		font-size: var(--font-size-1);
+		box-shadow: none;
+		width: var(--size-4);
+		height: var(--size-4);
+		color: var(--text-2);
+		transform: scaleX(125%);
+	}
+
+	.vote button.flip {
+		transform: scaleX(125%) rotate(180deg);
+	}
+
+	.vote button.voted {
+		color: var(--pink-7);
+		text-shadow:
+			0 0 3px var(--pink-5),
+			0 0 10px var(--pink-7);
+	}
+
+	.vote ~ span {
+		margin-block-end: 0.25rem;
 	}
 </style>

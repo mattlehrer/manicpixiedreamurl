@@ -3,6 +3,7 @@ import { LuciaError } from 'lucia';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { dashboardSites } from '$lib/config';
+import { insertDownVote, insertUpVote } from '$lib/server/handlers';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const session = await locals.auth?.validate();
@@ -35,10 +36,11 @@ export const actions: Actions = {
 				invalidPassword: true,
 			});
 		}
+		let key;
 		try {
 			// find user by key
 			// and validate password
-			const key = await auth.useKey('username', username.toLowerCase(), password);
+			key = await auth.useKey('username', username.toLowerCase(), password);
 			const session = await auth.createSession({
 				userId: key.userId,
 				attributes: {},
@@ -64,6 +66,16 @@ export const actions: Actions = {
 		if (!redirectLocation) {
 			redirect(307, '/dashboard');
 		}
+
+		const upvote = url.searchParams.get('upvote');
+		if (upvote) {
+			await insertUpVote({ ideaId: upvote, userId: key.userId }).catch((e) => console.error(e));
+		}
+		const downvote = url.searchParams.get('downvote');
+		if (downvote) {
+			await insertDownVote({ ideaId: downvote, userId: key.userId }).catch((e) => console.error(e));
+		}
+
 		redirectTo.searchParams.append('redirect', redirectLocation);
 		const idea = url.searchParams.get('idea');
 		if (idea) redirectTo.searchParams.append('idea', idea);

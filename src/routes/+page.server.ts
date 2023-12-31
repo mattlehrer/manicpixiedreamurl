@@ -9,6 +9,7 @@ import {
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { dashboardSites } from '$lib/config';
+import { sendVerificationEmail } from '$lib/server/email';
 
 export const actions: Actions = {
 	addSuggestion: async ({ url, locals, request }) => {
@@ -58,10 +59,12 @@ export const actions: Actions = {
 		if (!session) {
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
+			if (ideaId && typeof ideaId === 'string') redirectTo.searchParams.append('downvote', ideaId);
 			redirect(302, redirectTo);
 		}
 
 		if (!session.user.hasVerifiedEmail) {
+			// TODO: add toast to verify email with link to dashboard to resend
 			const redirectTo = new URL('/dashboard', dashboardSites[0]);
 			return redirect(302, redirectTo);
 		}
@@ -84,10 +87,12 @@ export const actions: Actions = {
 			console.log({ redirecting: true, session });
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
+			if (ideaId && typeof ideaId === 'string') redirectTo.searchParams.append('upvote', ideaId);
 			redirect(302, redirectTo);
 		}
 
 		if (!session.user.hasVerifiedEmail) {
+			// TODO: add toast to verify email with link to dashboard to resend
 			const redirectTo = new URL('/dashboard', dashboardSites[0]);
 			return redirect(302, redirectTo);
 		}
@@ -121,5 +126,18 @@ export const actions: Actions = {
 		});
 
 		return { inserted };
+	},
+	resendVerification: async ({ locals }) => {
+		const session = await locals.auth.validate();
+		if (!session) return fail(401);
+
+		let error;
+		await sendVerificationEmail({ email: session.user.email, id: session.user.userId }).catch((e) => {
+			console.error(e);
+			error = e;
+		});
+		if (error) return fail(500, { verificationError: true });
+
+		return { sent: true };
 	},
 };

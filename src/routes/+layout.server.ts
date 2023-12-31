@@ -18,6 +18,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 		const sessionCookie = cookies.get(authSessionCookieName);
 		let loggedIn = false;
 		let userId: string | undefined = undefined;
+		let isEmailVerified = false;
 		if (!sessionCookie) {
 			const token = url.searchParams.get('token');
 			if (token) {
@@ -29,6 +30,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 					loggedIn = true;
 					const session = await auth.getSession(sessionId);
 					userId = session?.user.userId;
+					isEmailVerified = session?.user.emailVerified;
 				} else {
 					cookies.set('mpdu_session_checked', 'true', cookieOpts);
 				}
@@ -44,6 +46,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			loggedIn = true;
 			const session = await locals.auth.validate();
 			userId = session?.user.userId;
+			isEmailVerified = session?.user.emailVerified;
 		}
 
 		const domainData = await getDomainByName(url.hostname);
@@ -71,6 +74,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			newIdea,
 			loggedIn,
 			userId,
+			isEmailVerified,
 		};
 	}
 

@@ -7,6 +7,7 @@
 	import { enhance } from '$app/forms';
 	import { queryParam, ssp } from 'sveltekit-search-params';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -32,23 +33,38 @@
 		<DomainReason reason={data.domain.reason} />
 		<section>
 			<h2>What do you wish you found at this domain?</h2>
+			{#if data.loggedIn && !data.isEmailVerified}
+				<form method="post" use:enhance>
+					{#if form?.sent}
+						<p class="notice success">Email sent! Click the link in that email to vote and submit ideas.</p>
+					{:else}
+						<p class="notice info" out:fade={{ duration: 2000 }}>
+							You need to verify your email address before you can vote or submit your own ideas. Check your inbox for a
+							verification email. If you can't find it, you can <button formaction="?/resendVerification"
+								>send another</button
+							>.
+						</p>
+					{/if}
+				</form>
+			{/if}
 			<h3>Vote on the best ideas so far:</h3>
+			<p></p>
 			<ul>
 				{#each data.ideas ?? [] as idea}
 					{@const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0)}
-					{@const existingVote = idea.votes.find((vote) => vote.userId === data.userId)}
+					{@const existingVote = data.userId && idea.votes.find((vote) => vote.userId === data.userId)}
 					<li>
 						<form class="vote" method="post" use:enhance>
 							<input type="hidden" name="idea" value={idea.id} />
 							<button
-								class:voted={existingVote?.type === 1}
-								formaction={existingVote?.type === 1 ? '?/unvote' : '?/upvote'}>^</button
+								class:voted={existingVote && existingVote?.type === 1}
+								formaction={existingVote && existingVote?.type === 1 ? '?/unvote' : '?/upvote'}>^</button
 							>
 							<span style={`margin-left: ${score < 0 ? '-1ch' : '0'}`}>{score}</span>
 							<button
 								class="flip"
-								class:voted={existingVote?.type === -1}
-								formaction={existingVote?.type === -1 ? '?/unvote' : '?/downvote'}>^</button
+								class:voted={existingVote && existingVote?.type === -1}
+								formaction={existingVote && existingVote?.type === -1 ? '?/unvote' : '?/downvote'}>^</button
 							>
 						</form>
 						<span>
@@ -109,6 +125,22 @@
 
 	form#submit-suggestion {
 		max-width: min(100%, 80ch);
+	}
+
+	form p.info.notice button {
+		display: inline;
+		color: var(--pink-6);
+		font-weight: var(--font-weight-8);
+		text-decoration: wavy underline;
+		text-underline-offset: 0.3rem;
+		text-decoration-skip-ink: none;
+		background: none;
+		border: none;
+		padding: 0;
+		font-size: inherit;
+		box-shadow: none;
+		text-shadow: none;
+		width: auto;
 	}
 
 	label {

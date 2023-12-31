@@ -24,6 +24,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	if (redirectLocation) loginLink.searchParams.append('redirect', redirectLocation);
 	const idea = url.searchParams.get('idea');
 	if (idea) loginLink.searchParams.append('idea', idea);
+	const upvote = url.searchParams.get('upvote');
+	if (upvote) loginLink.searchParams.append('upvote', upvote);
+	const downvote = url.searchParams.get('downvote');
+	if (downvote) loginLink.searchParams.append('downvote', downvote);
 
 	return {
 		loginLink: loginLink.pathname + loginLink.search,
@@ -101,6 +105,10 @@ export const actions: Actions = {
 		redirectTo.searchParams.append('redirect', redirectLocation);
 		const idea = url.searchParams.get('idea');
 		if (idea) redirectTo.searchParams.append('idea', idea);
+		// const upvote = url.searchParams.get('upvote');
+		// if (upvote) redirectTo.searchParams.append('voted', '1');
+		// const downvote = url.searchParams.get('downvote');
+		// if (downvote) redirectTo.searchParams.append('voted', '1');
 
 		redirect(302, redirectTo.href);
 	},

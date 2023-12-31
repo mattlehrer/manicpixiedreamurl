@@ -56,13 +56,6 @@ export const getDomainByName = async (input: string) => {
 			reason: true,
 			isActive: true,
 		},
-		with: {
-			owner: {
-				columns: {
-					username: true,
-				},
-			},
-		},
 	});
 };
 

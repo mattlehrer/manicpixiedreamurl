@@ -32,7 +32,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 					if (session) {
 						loggedIn = true;
 						userId = session.user.userId;
-						isEmailVerified = !!session.user.hasVerifiedEmail;
+						isEmailVerified = session.user.hasVerifiedEmail;
 					}
 				} else {
 					cookies.set('mpdu_session_checked', 'true', cookieOpts);
@@ -51,7 +51,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			if (session) {
 				loggedIn = true;
 				userId = session.user.userId;
-				isEmailVerified = !!session.user.hasVerifiedEmail;
+				isEmailVerified = session.user.hasVerifiedEmail;
 			}
 		}
 

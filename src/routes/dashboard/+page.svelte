@@ -50,12 +50,12 @@
 <h1>Welcome {data.username}</h1>
 
 {#if !data.hasVerifiedEmail}
-	<div class="notice">
-		{#if form?.verificationError}<p class="error">Something went wrong. Please try again.</p>{/if}
+	<div>
+		{#if form?.verificationError}<p class="notice error">Something went wrong. Please try again.</p>{/if}
 		{#if form?.sent}
 			<p class="notice success">Check your email!</p>
 		{:else}
-			<p>
+			<p class="notice">
 				You haven't verified your email address yet. You'll need to do that before you can submit ideas and vote on
 				them. Please check your email for a verification link.
 			</p>

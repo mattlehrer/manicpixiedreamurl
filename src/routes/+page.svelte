@@ -34,7 +34,6 @@
 		<section>
 			<h2>What do you wish you found at this domain?</h2>
 			{#if data.loggedIn && !data.isEmailVerified}
-				{JSON.stringify(data)}
 				<form method="post" use:enhance>
 					{#if form?.sent}
 						<p class="notice success">Email sent! Click the link in that email to vote and submit ideas.</p>

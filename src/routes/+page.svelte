@@ -7,7 +7,7 @@
 	import { enhance } from '$app/forms';
 	import { queryParam, ssp } from 'sveltekit-search-params';
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -34,6 +34,7 @@
 		<section>
 			<h2>What do you wish you found at this domain?</h2>
 			{#if data.loggedIn && !data.isEmailVerified}
+				{JSON.stringify(data)}
 				<form method="post" use:enhance>
 					{#if form?.sent}
 						<p class="notice success">Email sent! Click the link in that email to vote and submit ideas.</p>
@@ -76,8 +77,11 @@
 
 			<form id="submit-suggestion" action="?/addSuggestion" method="post" use:enhance>
 				<label for="idea"> What's your best idea for this domain? </label>
-				{#if form?.invalid}<p class="error">That wasn't a good idea. You can do better.</p>{/if}
-				{#if form?.notUnique}<p class="error">Someone has already suggested that idea. Upvote it instead!</p>{/if}
+				{#if form?.invalid}<p class="error" transition:slide>That wasn't a good idea. You can do better.</p>{/if}
+				{#if form?.notUnique}<p class="error" transition:slide>
+						Someone has already suggested that idea. Upvote it instead!
+					</p>{/if}
+				{#if form?.flagged}<p class="error" transition:slide>We don't allow ideas like that.</p>{/if}
 				<input type="text" name="idea" id="idea" value={data.newIdea} minlength="5" required />
 				<input type="submit" />
 			</form>
@@ -209,5 +213,9 @@
 
 	.vote ~ span {
 		margin-block-end: 0.25rem;
+	}
+
+	p.error {
+		padding-block-end: var(--size-fluid-1);
 	}
 </style>

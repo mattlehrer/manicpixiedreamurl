@@ -55,6 +55,7 @@
 		"lucia": "^2.7.6",
 		"lucide-svelte": "^0.303.0",
 		"open-props": "^1.6.16",
+		"openai": "^4.24.1",
 		"parse-domain": "^8.0.1",
 		"resend": "^2.1.0",
 		"uid": "^2.0.2",

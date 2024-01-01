@@ -10,6 +10,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { dashboardSites } from '$lib/config';
 import { sendVerificationEmail } from '$lib/server/email';
+import { isProhibitedTextWithReasons } from '$lib/server/moderation';
 
 export const actions: Actions = {
 	addSuggestion: async ({ url, locals, request }) => {
@@ -42,6 +43,17 @@ export const actions: Actions = {
 
 		const ideaExists = await getIdeaForDomainByText(domainId, newIdea);
 		if (ideaExists) return fail(400, { notUnique: 'Idea already exists' });
+
+		const { flagged, ...reasons } = await isProhibitedTextWithReasons(newIdea).catch((e) => {
+			console.error(e);
+			return { flagged: false, categories: {} };
+		});
+
+		console.log({ newIdea, flagged, reasons });
+		if (flagged) {
+			const reason = Object.entries(reasons.categories).filter(([, bool]) => bool)[0][0];
+			return fail(400, { flagged: reason });
+		}
 
 		const inserted = await insertIdea({
 			ownerId: session.user.userId,

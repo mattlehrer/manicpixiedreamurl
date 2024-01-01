@@ -1,11 +1,15 @@
 <script lang="ts">
 	export let reason: string;
+
+	if (reason.endsWith('.')) {
+		reason = reason.slice(0, -1);
+	}
 </script>
 
 <p class="reason">
 	Someone bought this domain
 	{#if reason}
-		because <span>{reason}</span>.
+		because <span>{reason}.</span>
 	{:else}
 		and we don't know why yet.
 	{/if}

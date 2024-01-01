@@ -6,7 +6,10 @@ import type { isProhibitedTextWithReasons } from './moderation';
 export type User = typeof user.$inferSelect;
 
 export const updateUser = (userId: string, data: Partial<User>) => {
-	return db.update(user).set(data).where(eq(user.id, userId));
+	return db
+		.update(user)
+		.set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })
+		.where(eq(user.id, userId));
 };
 
 export const insertEmailVerificationCode = (userId: string) => {
@@ -40,7 +43,10 @@ export const insertDomain = (newDomain: Domain) => {
 };
 
 export const updateDomain = (domainId: string, data: Partial<Domain>) => {
-	return db.update(domain).set(data).where(eq(domain.id, domainId));
+	return db
+		.update(domain)
+		.set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })
+		.where(eq(domain.id, domainId));
 };
 
 export const getDomainsForUser = (ownerId: string) => {

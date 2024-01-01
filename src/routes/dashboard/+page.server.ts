@@ -10,7 +10,6 @@ const MAX_DOMAINS = 3;
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const session = await locals.auth?.validate();
-	console.log('dashboard-load', { session });
 	if (!session) redirect(302, '/login');
 
 	const domains = await getDomainsForUser(session.user.userId);

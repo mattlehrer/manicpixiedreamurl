@@ -28,7 +28,6 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 					cookies.delete('mpdu_session_checked', cookieOpts);
 					sessionTokens.delete(token);
 					const session = await auth.getSession(sessionId);
-					console.log('token-checked', { session });
 					if (session) {
 						loggedIn = true;
 						userId = session.user.userId;
@@ -47,7 +46,6 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			}
 		} else {
 			const session = await locals.auth.validate();
-			console.log('cookie-checked', { session });
 			if (session) {
 				loggedIn = true;
 				userId = session.user.userId;

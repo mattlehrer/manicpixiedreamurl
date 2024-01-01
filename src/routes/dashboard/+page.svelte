@@ -105,9 +105,9 @@
 	{#if form?.subdomain}<p class="error">Subdomains are not permitted.</p>{/if}
 	{#if form?.dnsNotVerified}<p class="error">Verify the domains you've already added before adding more.</p>{/if}
 	<label for="domain">Add a domain</label>
-	<input type="text" name="domain" placeholder="example.com" bind:value={domain} />
+	<input type="text" id="domain" name="domain" placeholder="example.com" bind:value={domain} />
 	<label for="reason">Add a reason you bought it</label>
-	<input type="text" name="reason" placeholder="" bind:value={reason} />
+	<input type="text" id="reason" name="reason" placeholder="" bind:value={reason} />
 
 	<input type="submit" value="Add domain" disabled={!mightBeAbleToAddDomain} />
 	{#if data.domains.length === 0}

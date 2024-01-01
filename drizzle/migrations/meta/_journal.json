@@ -57,6 +57,13 @@
       "when": 1702978697845,
       "tag": "0007_complex_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1704142278965,
+      "tag": "0008_unique_silver_samurai",
+      "breakpoints": true
     }
   ]
 }

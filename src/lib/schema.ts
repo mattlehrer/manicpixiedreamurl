@@ -18,6 +18,7 @@ export const user = sqliteTable('user', {
 export const userRelations = relations(user, ({ many }) => ({
 	domain: many(domain),
 	ideas: many(idea),
+	flaggedIdeas: many(flaggedIdea),
 	votes: many(vote),
 }));
 
@@ -118,6 +119,33 @@ export const ideaRelations = relations(idea, ({ one, many }) => ({
 		references: [user.id],
 	}),
 	votes: many(vote),
+}));
+
+export const flaggedIdea = sqliteTable('flagged_idea', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
+	domainId: text('domain_id')
+		.notNull()
+		.references(() => domain.id),
+	ownerId: text('owner_id')
+		.notNull()
+		.references(() => user.id),
+	text: text('text').notNull(),
+	moderationData: text('moderation_data', { mode: 'json' }),
+	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const flaggedIdeaRelations = relations(flaggedIdea, ({ one }) => ({
+	domain: one(domain, {
+		fields: [flaggedIdea.domainId],
+		references: [domain.id],
+	}),
+	owner: one(user, {
+		fields: [flaggedIdea.ownerId],
+		references: [user.id],
+	}),
 }));
 
 export const vote = sqliteTable(

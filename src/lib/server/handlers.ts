@@ -1,6 +1,7 @@
-import { domain, emailVerificationCode, idea, user, vote } from '$lib/schema';
+import { domain, emailVerificationCode, flaggedIdea, idea, user, vote } from '$lib/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from './db';
+import type { isProhibitedTextWithReasons } from './moderation';
 
 export type User = typeof user.$inferSelect;
 
@@ -61,6 +62,20 @@ export const getDomainByName = async (input: string) => {
 
 export const insertIdea = async ({ domainId, ownerId, text }: { domainId: string; ownerId: string; text: string }) => {
 	return db.insert(idea).values({ domainId, ownerId, text });
+};
+
+export const insertFlaggedIdea = async ({
+	domainId,
+	ownerId,
+	text,
+	moderationData,
+}: {
+	domainId: string;
+	ownerId: string;
+	text: string;
+	moderationData: Awaited<ReturnType<typeof isProhibitedTextWithReasons>>;
+}) => {
+	return db.insert(flaggedIdea).values({ domainId, ownerId, text, moderationData });
 };
 
 export const getIdeaForDomainByText = async (domainId: string, text: string) => {

@@ -2,6 +2,7 @@ import {
 	getDomainByName,
 	getIdeaForDomainByText,
 	insertDownVote,
+	insertFlaggedIdea,
 	insertIdea,
 	insertUpVote,
 	removeVote,
@@ -49,6 +50,12 @@ export const actions: Actions = {
 
 			if (flagged) {
 				console.log({ newIdea, flagged, reasons });
+				await insertFlaggedIdea({
+					ownerId: session.user.userId,
+					domainId,
+					text: newIdea,
+					moderationData: { ...reasons, flagged },
+				});
 				const reason = Object.entries(reasons.categories).filter(([, bool]) => bool)[0][0];
 				return fail(400, { flagged: reason });
 			}

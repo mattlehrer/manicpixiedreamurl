@@ -49,7 +49,6 @@
 				</form>
 			{/if}
 			<h3>Vote on the best ideas so far:</h3>
-			<p></p>
 			<ul>
 				{#each data.ideas ?? [] as idea}
 					{@const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0)}
@@ -72,6 +71,8 @@
 							{idea.text}
 						</span>
 					</li>
+				{:else}
+					<p>No one has submitted a good idea for this site yet. Be the first!</p>
 				{/each}
 			</ul>
 
@@ -173,6 +174,11 @@
 		gap: var(--size-fluid-2);
 		margin-block-start: 0;
 		margin-block-end: var(--size-fluid-1);
+	}
+
+	ul > p {
+		font-weight: var(--font-weight-3);
+		text-wrap: balance;
 	}
 
 	.vote {

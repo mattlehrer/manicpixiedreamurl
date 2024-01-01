@@ -44,15 +44,16 @@ export const actions: Actions = {
 		const ideaExists = await getIdeaForDomainByText(domainId, newIdea);
 		if (ideaExists) return fail(400, { notUnique: 'Idea already exists' });
 
-		const { flagged, ...reasons } = await isProhibitedTextWithReasons(newIdea).catch((e) => {
-			console.error(e);
-			return { flagged: false, categories: {} };
-		});
+		try {
+			const { flagged, ...reasons } = await isProhibitedTextWithReasons(newIdea);
 
-		console.log({ newIdea, flagged, reasons });
-		if (flagged) {
-			const reason = Object.entries(reasons.categories).filter(([, bool]) => bool)[0][0];
-			return fail(400, { flagged: reason });
+			if (flagged) {
+				console.log({ newIdea, flagged, reasons });
+				const reason = Object.entries(reasons.categories).filter(([, bool]) => bool)[0][0];
+				return fail(400, { flagged: reason });
+			}
+		} catch (error) {
+			console.error(error);
 		}
 
 		const inserted = await insertIdea({

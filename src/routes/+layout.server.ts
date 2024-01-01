@@ -27,10 +27,13 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 					cookies.set(authSessionCookieName, sessionId, cookieOpts);
 					cookies.delete('mpdu_session_checked', cookieOpts);
 					sessionTokens.delete(token);
-					loggedIn = true;
 					const session = await auth.getSession(sessionId);
-					userId = session?.user.userId;
-					isEmailVerified = !!session?.user.hasVerifiedEmail;
+					console.log('token-checked', { session });
+					if (session) {
+						loggedIn = true;
+						userId = session.user.userId;
+						isEmailVerified = !!session.user.hasVerifiedEmail;
+					}
 				} else {
 					cookies.set('mpdu_session_checked', 'true', cookieOpts);
 				}
@@ -43,10 +46,13 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 				}
 			}
 		} else {
-			loggedIn = true;
 			const session = await locals.auth.validate();
-			userId = session?.user.userId;
-			isEmailVerified = !!session?.user.hasVerifiedEmail;
+			console.log('cookie-checked', { session });
+			if (session) {
+				loggedIn = true;
+				userId = session.user.userId;
+				isEmailVerified = !!session.user.hasVerifiedEmail;
+			}
 		}
 
 		const domainData = await getDomainByName(url.hostname);

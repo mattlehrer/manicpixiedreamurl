@@ -23,7 +23,7 @@
 	{#if data.origin && dashboardSites.includes(data.origin)}
 		<title>Manic Pixie Dream URL is a social network for parked domains</title>
 	{:else}
-		<title>{data.host} is a work in progress | Manic Pixie Dream URL</title>
+		<title>What did you hope to find at {data.host}? | A Manic Pixie Dream URL</title>
 	{/if}
 </svelte:head>
 

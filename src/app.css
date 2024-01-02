@@ -60,11 +60,16 @@ form {
 }
 
 label {
+	margin-block-start: var(--size-2);
 	margin-block-end: var(--size-1);
 }
 
 label:first-child {
 	margin-block-start: var(--size-6);
+}
+
+form > button {
+	margin-block-start: var(--size-2);
 }
 
 form p.error {

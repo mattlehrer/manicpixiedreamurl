@@ -37,4 +37,4 @@
 	{/if}
 	<button type="submit">Sign up</button>
 </form>
-<a href={data.loginLink}>Sign in</a>
+<a href={data.loginLink}>Already have an account? Sign in</a>

@@ -30,4 +30,4 @@
 	{/if}
 	<button type="submit">Sign in</button>
 </form>
-<a href="/signup">Create an account</a>
+<a href="/signup">Need an account? Sign up</a>

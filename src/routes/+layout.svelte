@@ -19,6 +19,12 @@
 			src="/js/script.js"
 		></script>
 	{/if}
+
+	{#if data.origin && dashboardSites.includes(data.origin)}
+		<title>Manic Pixie Dream URL is a social network for parked domains</title>
+	{:else}
+		<title>{data.host} is a work in progress | Manic Pixie Dream URL</title>
+	{/if}
 </svelte:head>
 
 {#if data.origin && dashboardSites.includes(data.origin)}

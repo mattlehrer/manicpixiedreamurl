@@ -45,6 +45,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Dashboard | Manic Pixie Dream URL</title>
+</svelte:head>
+
 <svelte:window bind:innerWidth bind:innerHeight />
 
 <h1>Welcome {data.username}</h1>

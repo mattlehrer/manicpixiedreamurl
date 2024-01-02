@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
 	import { PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY } from '$env/static/public';
+	import { dev } from '$app/environment';
 
 	export let form: ActionData;
 	export let data: PageData;
@@ -27,11 +28,13 @@
 	<input name="email" id="email" /><br />
 	<label for="password">Password</label>
 	<input type="password" name="password" id="password" /><br />
-	<div
-		class="cf-turnstile"
-		data-appearance="interaction-only"
-		data-sitekey={PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY}
-	></div>
+	{#if !dev}
+		<div
+			class="cf-turnstile"
+			data-appearance="interaction-only"
+			data-sitekey={PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY}
+		></div>
+	{/if}
 	<button type="submit">Sign up</button>
 </form>
 <a href={data.loginLink}>Sign in</a>

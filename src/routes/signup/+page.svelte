@@ -32,6 +32,6 @@
 		data-appearance="interaction-only"
 		data-sitekey={PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY}
 	></div>
-	<input type="submit" />
+	<button type="submit">Sign up</button>
 </form>
 <a href={data.loginLink}>Sign in</a>

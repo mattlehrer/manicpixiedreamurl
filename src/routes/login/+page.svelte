@@ -15,6 +15,6 @@
 	<input name="username" id="username" value={form?.username ?? ''} /><br />
 	<label for="password">Password</label>
 	<input type="password" name="password" id="password" /><br />
-	<input type="submit" />
+	<button type="submit">Sign in</button>
 </form>
 <a href="/signup">Create an account</a>

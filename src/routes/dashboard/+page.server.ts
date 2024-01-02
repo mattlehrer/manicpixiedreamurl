@@ -60,6 +60,7 @@ export const actions: Actions = {
 	resendVerification: async ({ locals }) => {
 		const session = await locals.auth.validate();
 		if (!session) return fail(401);
+		if (session.user.hasVerifiedEmail) return fail(400, { alreadyVerified: true });
 
 		let error;
 		await sendVerificationEmail({ email: session.user.email, id: session.user.userId }).catch((e) => {

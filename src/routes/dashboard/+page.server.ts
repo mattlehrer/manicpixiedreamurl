@@ -48,14 +48,19 @@ export const actions: Actions = {
 		if (parseResult.type === ParseResultType.Listed && parseResult.subDomains.length)
 			return fail(400, { domain, subdomain: true });
 
-		const inserted = await insertDomain({
-			ownerId: session.user.userId,
-			name: domain,
-			reason,
-			isActive: true,
-		});
+		try {
+			await insertDomain({
+				ownerId: session.user.userId,
+				name: domain,
+				reason,
+				isActive: true,
+			});
 
-		return { inserted };
+			return { inserted: true };
+		} catch (error) {
+			console.error(error);
+			return fail(500, { dbError: true });
+		}
 	},
 	resendVerification: async ({ locals }) => {
 		const session = await locals.auth.validate();

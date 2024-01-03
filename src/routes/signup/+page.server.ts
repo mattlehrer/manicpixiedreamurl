@@ -5,8 +5,6 @@ import type { PageServerLoad, Actions } from './$types';
 import Database from 'better-sqlite3';
 import { sendVerificationEmail } from '$lib/server/email';
 import { dashboardSites } from '$lib/config';
-import { validateToken } from '$lib/server/turnstile';
-import { dev } from '$app/environment';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const session = await locals.auth?.validate();
@@ -39,21 +37,6 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, url }) => {
 		const formData = await request.formData();
-
-		if (!dev) {
-			const token = formData.get('cf-turnstile-response');
-			if (typeof token !== 'string') {
-				console.error('No turnstile token');
-				return fail(400, { captcha: true });
-			}
-
-			const { success, error } = await validateToken(token);
-
-			if (!success) {
-				console.error({ error });
-				return fail(400, { captcha: true });
-			}
-		}
 
 		const username = formData.get('username');
 		const email = formData.get('email');

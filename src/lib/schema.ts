@@ -28,7 +28,7 @@ export const emailVerificationCode = sqliteTable('email_verification', {
 		.$defaultFn(() => createId()),
 	userId: text('user_id')
 		.notNull()
-		.references(() => user.id),
+		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 	code: text('code').$defaultFn(() => createVerificationCode()),
 	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
@@ -44,7 +44,7 @@ export const session = sqliteTable('user_session', {
 	id: text('id').primaryKey(),
 	userId: text('user_id')
 		.notNull()
-		.references(() => user.id),
+		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 	activeExpires: blob('active_expires', {
 		mode: 'bigint',
 	}).notNull(),
@@ -57,7 +57,7 @@ export const key = sqliteTable('user_key', {
 	id: text('id').primaryKey(),
 	userId: text('user_id')
 		.notNull()
-		.references(() => user.id),
+		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 	hashedPassword: text('hashed_password'),
 });
 
@@ -70,7 +70,7 @@ export const domain = sqliteTable(
 		name: text('name').notNull().unique(),
 		ownerId: text('owner_id')
 			.notNull()
-			.references(() => user.id),
+			.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 		reason: text('reason').notNull().default(''),
 		isActive: integer('is_active', { mode: 'boolean' }),
 		bareDNSisVerified: integer('bare_dns_is_verified', { mode: 'boolean' }).default(false),
@@ -100,10 +100,11 @@ export const idea = sqliteTable('idea', {
 		.$defaultFn(() => createId()),
 	domainId: text('domain_id')
 		.notNull()
-		.references(() => domain.id),
+		.references(() => domain.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 	ownerId: text('owner_id')
 		.notNull()
-		.references(() => user.id),
+		// don't delete on cascade, because we want to keep the idea around
+		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'no action' }),
 	text: text('text').notNull(),
 	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
@@ -127,10 +128,11 @@ export const flaggedIdea = sqliteTable('flagged_idea', {
 		.$defaultFn(() => createId()),
 	domainId: text('domain_id')
 		.notNull()
-		.references(() => domain.id),
+		.references(() => domain.id, { onUpdate: 'cascade', onDelete: 'no action' }),
 	ownerId: text('owner_id')
 		.notNull()
-		.references(() => user.id),
+		// don't delete on cascade, because we want to keep the flagged idea around
+		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'no action' }),
 	text: text('text').notNull(),
 	moderationData: text('moderation_data', { mode: 'json' }),
 	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
@@ -157,10 +159,10 @@ export const vote = sqliteTable(
 		type: integer('type', { mode: 'number' }).notNull(), // +1, -1, 0 (or deleted?)
 		ideaId: text('idea_id')
 			.notNull()
-			.references(() => idea.id),
+			.references(() => idea.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 		userId: text('user_id')
 			.notNull()
-			.references(() => user.id),
+			.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
 		createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
 	},

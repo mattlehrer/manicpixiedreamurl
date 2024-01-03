@@ -16,6 +16,7 @@ try {
 	const migrationsPath = workingDir + '/drizzle/migrations';
 	console.log({ migrationsPath });
 	migrate(db, { migrationsFolder: migrationsPath });
+	sqliteDatabase.close();
 } catch (error) {
 	console.error(error);
 	if (error instanceof Error) console.error(error.name, error.message);

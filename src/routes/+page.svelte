@@ -172,7 +172,7 @@
 		align-items: center;
 		gap: var(--size-fluid-2);
 		margin-block-start: 0;
-		margin-block-end: var(--size-fluid-1);
+		margin-block-end: var(--size-fluid-3);
 	}
 
 	ul > p {

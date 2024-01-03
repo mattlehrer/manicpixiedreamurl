@@ -73,7 +73,9 @@ export const getDomainById = async (id: string) => {
 };
 
 export const insertIdea = async ({ domainId, ownerId, text }: { domainId: string; ownerId: string; text: string }) => {
-	return db.insert(idea).values({ domainId, ownerId, text });
+	const insertedIdea = await db.insert(idea).values({ domainId, ownerId, text }).returning({ id: idea.id });
+	await insertUpVote({ ideaId: insertedIdea[0].id, userId: ownerId });
+	return insertedIdea;
 };
 
 export const insertFlaggedIdea = async ({

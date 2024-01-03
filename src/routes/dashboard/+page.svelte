@@ -225,7 +225,7 @@
 						<a href="//{domain.name}{dev ? ':5173' : ''}">{domain.name}</a>
 					</td>
 					<td class="dns-column">
-						<DNSVerification {domain}></DNSVerification>
+						<DNSVerification bind:domain></DNSVerification>
 					</td>
 
 					<td class="wider">

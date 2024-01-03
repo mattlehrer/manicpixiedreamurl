@@ -66,6 +66,12 @@ export const getDomainByName = async (input: string) => {
 	});
 };
 
+export const getDomainById = async (id: string) => {
+	return db.query.domain.findFirst({
+		where: (domain, { and, eq }) => and(eq(domain.id, id), eq(domain.isActive, true)),
+	});
+};
+
 export const insertIdea = async ({ domainId, ownerId, text }: { domainId: string; ownerId: string; text: string }) => {
 	return db.insert(idea).values({ domainId, ownerId, text });
 };

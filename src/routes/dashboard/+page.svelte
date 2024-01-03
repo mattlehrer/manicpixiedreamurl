@@ -208,7 +208,7 @@
 				<th>Domain</th>
 				<th class="dns-column">DNS</th>
 				<th class="wider">Reason</th>
-				<!-- <th>Remove</th> -->
+				<th>Remove</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -262,12 +262,13 @@
 							<span class="sr-only">Updated</span>
 						{/if}
 					</td>
-					<!-- <td>
-					<form method="post" action="?/removeDomain" use:enhance>
-						<input type="hidden" name="domain" value={domain.name} />
-						<input type="submit" value="Remove" />
-					</form>
-				</td> -->
+					<!-- TODO: make this a small button and add an "are you sure? this action cannot be undone." dialog to confirm-->
+					<td>
+						<form method="post" action="?/deleteDomain" use:enhance>
+							<input type="hidden" name="domainId" value={domain.id} />
+							<input type="submit" value="Remove" />
+						</form>
+					</td>
 				</tr>
 			{/each}
 		</tbody>

@@ -2,7 +2,7 @@ import { ParseResultType, parseDomain } from 'parse-domain';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { auth } from '$lib/server/lucia';
-import { getDomainsForUser, insertDomain } from '$lib/server/handlers';
+import { deleteDomain, getDomainsForUser, insertDomain } from '$lib/server/handlers';
 import { dev } from '$app/environment';
 import { sendVerificationEmail } from '$lib/server/email';
 
@@ -56,6 +56,24 @@ export const actions: Actions = {
 		});
 
 		return { inserted };
+	},
+	deleteDomain: async ({ locals, request }) => {
+		const session = await locals.auth.validate();
+		if (!session) return fail(401);
+
+		const data = await request.formData();
+		const domainId = data.get('domainId');
+
+		if (!domainId || typeof domainId !== 'string') return fail(400, { domainId, invalid: true });
+
+		try {
+			const deleted = await deleteDomain(domainId, session.user.userId);
+			console.log({ deleted });
+			return { deleted };
+		} catch (error) {
+			console.error(error);
+			return fail(500, { error: true });
+		}
 	},
 	resendVerification: async ({ locals }) => {
 		const session = await locals.auth.validate();

@@ -1,5 +1,5 @@
 import { domain, emailVerificationCode, flaggedIdea, idea, user, vote } from '$lib/schema';
-import { desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { db } from './db';
 import type { isProhibitedTextWithReasons } from './moderation';
 
@@ -47,6 +47,10 @@ export const updateDomain = (domainId: string, data: Partial<Domain>) => {
 		.update(domain)
 		.set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })
 		.where(eq(domain.id, domainId));
+};
+
+export const deleteDomain = (domainId: (typeof domain.$inferSelect)['id'], ownerId: User['id']) => {
+	return db.delete(domain).where(and(eq(domain.id, domainId), eq(domain.ownerId, ownerId)));
 };
 
 export const getDomainsForUser = (ownerId: string) => {

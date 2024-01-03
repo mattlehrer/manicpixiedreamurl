@@ -3,7 +3,8 @@ import { LuciaError } from 'lucia';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { dashboardSites } from '$lib/config';
-import { insertDownVote, insertUpVote } from '$lib/server/handlers';
+import { getDomainByName, insertDownVote, insertIdea, insertUpVote } from '$lib/server/handlers';
+import { dev } from '$app/environment';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const session = await locals.auth?.validate();
@@ -38,11 +39,12 @@ export const actions: Actions = {
 			});
 		}
 		let key;
+		let session;
 		try {
 			// find user by key
 			// and validate password
 			key = await auth.useKey('username', username.toLowerCase(), password);
-			const session = await auth.createSession({
+			session = await auth.createSession({
 				userId: key.userId,
 				attributes: {},
 			});
@@ -79,7 +81,11 @@ export const actions: Actions = {
 
 		redirectTo.searchParams.append('redirect', redirectLocation);
 		const idea = url.searchParams.get('idea');
-		if (idea) redirectTo.searchParams.append('idea', idea);
+		if (idea) {
+			const domainId = (await getDomainByName(dev ? redirectLocation.replace(':5173', '') : domain))?.id;
+			if (!domainId) return redirect(302, redirectTo.href);
+			await insertIdea({ domainId, ownerId: session.user.userId, text: idea });
+		}
 
 		redirect(302, redirectTo.href);
 	},

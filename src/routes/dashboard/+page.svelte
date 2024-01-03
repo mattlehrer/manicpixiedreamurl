@@ -43,6 +43,13 @@
 			mightBeAbleToAddDomain = false;
 		}
 	});
+
+	$effect(() => {
+		if (form?.inserted) {
+			reason = '';
+			domain = '';
+		}
+	});
 </script>
 
 <svelte:head>

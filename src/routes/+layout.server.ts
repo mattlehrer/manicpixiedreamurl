@@ -1,7 +1,7 @@
 import { authSessionCookieName, dashboardSites } from '$lib/config';
 import { error, redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { getDomainByName, getIdeasWithVotesForDomainId } from '$lib/server/handlers';
+import { getDomainByName, getIdeasWithVotesForDomainId, getRandomDomains } from '$lib/server/handlers';
 import { sessionTokens } from '$lib/server/session_token';
 import { dev } from '$app/environment';
 import { auth } from '$lib/server/lucia';
@@ -70,6 +70,8 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 
 		const newIdea = url.searchParams.get('idea') ?? '';
 
+		const discoveryDomains = await getRandomDomains(3, domainData.id);
+
 		return {
 			host: url.host,
 			pathname: url.pathname,
@@ -79,10 +81,12 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			loggedIn,
 			userId,
 			isEmailVerified,
+			discoveryDomains,
 		};
 	}
 
 	const session = await locals.auth?.validate();
+	const discoveryDomains = await getRandomDomains(3);
 
 	return {
 		origin: url.origin,
@@ -90,5 +94,6 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 		pathname: url.pathname,
 		username: session?.user.username,
 		loggedIn: !!session,
+		discoveryDomains,
 	};
 };

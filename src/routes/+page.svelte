@@ -25,7 +25,7 @@
 </script>
 
 {#if data.origin && dashboardSites.includes(data.origin)}
-	<Landing />
+	<Landing loggedIn={data.loggedIn} discoveryDomains={data.discoveryDomains} />
 {:else if data.domain !== undefined}
 	<NetworkHeader />
 	<div class="wrapper">

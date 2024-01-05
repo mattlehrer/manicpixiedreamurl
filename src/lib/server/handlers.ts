@@ -1,5 +1,5 @@
 import { domain, emailVerificationCode, flaggedIdea, idea, user, vote } from '$lib/schema';
-import { desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, not, sql } from 'drizzle-orm';
 import { db } from './db';
 import type { isProhibitedTextWithReasons } from './moderation';
 
@@ -69,6 +69,47 @@ export const getDomainByName = async (input: string) => {
 export const getDomainById = async (id: string) => {
 	return db.query.domain.findFirst({
 		where: (domain, { and, eq }) => and(eq(domain.id, id), eq(domain.isActive, true)),
+	});
+};
+
+export const getRandomDomains = async (limit: number, domainId: string = '') => {
+	const domains = await db.query.domain.findMany({
+		limit,
+		orderBy: [sql`RANDOM()`],
+		where: (domain, { eq }) =>
+			and(eq(domain.isActive, true), eq(domain.bareDNSisVerified, true), not(eq(domain.id, domainId))),
+		columns: {
+			id: true,
+			name: true,
+			reason: true,
+			isActive: true,
+		},
+		with: {
+			ideas: {
+				columns: {
+					text: true,
+					updatedAt: true,
+				},
+				with: {
+					votes: {
+						columns: {
+							type: true,
+							updatedAt: true,
+						},
+					},
+				},
+			},
+		},
+	});
+
+	return domains.map((domain) => {
+		const ideaScores = domain.ideas
+			.map((idea) => {
+				const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0);
+				return { text: idea.text, updatedAt: idea.updatedAt, score };
+			})
+			.sort((a, b) => b.score - a.score);
+		return { ...domain, ideas: ideaScores };
 	});
 };
 

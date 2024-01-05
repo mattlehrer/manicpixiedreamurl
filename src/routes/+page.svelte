@@ -210,10 +210,10 @@
 	}
 
 	.vote button.voted {
-		color: var(--pink-7);
+		color: var(--pink-8);
 		text-shadow:
 			0 0 3px var(--pink-5),
-			0 0 10px var(--pink-7);
+			0 0 8px var(--pink-6);
 	}
 
 	.vote ~ span {

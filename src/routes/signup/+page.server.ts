@@ -5,7 +5,7 @@ import type { PageServerLoad, Actions } from './$types';
 import Database from 'better-sqlite3';
 import { sendVerificationEmail } from '$lib/server/email';
 import { dashboardSites } from '$lib/config';
-import { validateToken } from '$lib/server/turnstile';
+import { getDomainByName, insertDownVote, insertIdea, insertUpVote } from '$lib/server/handlers';
 import { dev } from '$app/environment';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -15,8 +15,23 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		if (!domain) redirect(307, '/');
 		const redirectTo = new URL('/check-session', dashboardSites[0]);
 		redirectTo.searchParams.append('redirect', domain);
+
 		const idea = url.searchParams.get('idea');
-		if (idea) redirectTo.searchParams.append('idea', idea);
+		if (idea) {
+			const domainId = (await getDomainByName(dev ? domain.replace(':5173', '') : domain))?.id;
+			if (!domainId) return redirect(302, redirectTo.href);
+			await insertIdea({ domainId, ownerId: session.user.userId, text: idea });
+		}
+
+		const downvote = url.searchParams.get('downvote');
+		if (downvote) {
+			await insertDownVote({ ideaId: downvote, userId: session.user.userId });
+		}
+
+		const upvote = url.searchParams.get('upvote');
+		if (upvote) {
+			await insertUpVote({ ideaId: upvote, userId: session.user.userId });
+		}
 
 		redirect(302, redirectTo.href);
 	}
@@ -39,21 +54,6 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, url }) => {
 		const formData = await request.formData();
-
-		if (!dev) {
-			const token = formData.get('cf-turnstile-response');
-			if (typeof token !== 'string') {
-				console.error('No turnstile token');
-				return fail(400, { captcha: true });
-			}
-
-			const { success, error } = await validateToken(token);
-
-			if (!success) {
-				console.error({ error });
-				return fail(400, { captcha: true });
-			}
-		}
 
 		const username = formData.get('username');
 		const email = formData.get('email');

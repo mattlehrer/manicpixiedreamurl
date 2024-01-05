@@ -8,6 +8,7 @@
 	import { queryParam, ssp } from 'sveltekit-search-params';
 	import { onMount } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
+	import DomainDiscovery from '$lib/components/DomainDiscovery.svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -25,7 +26,7 @@
 </script>
 
 {#if data.origin && dashboardSites.includes(data.origin)}
-	<Landing />
+	<Landing loggedIn={data.loggedIn} discoveryDomains={data.discoveryDomains} />
 {:else if data.domain !== undefined}
 	<NetworkHeader />
 	<div class="wrapper">
@@ -86,6 +87,8 @@
 				<input type="submit" />
 			</form>
 		</section>
+
+		<DomainDiscovery discoveryDomains={data.discoveryDomains} other={true} />
 	</div>
 {:else}
 	<!-- 404 from +page.server -->
@@ -120,7 +123,7 @@
 
 	.wrapper {
 		padding-inline: var(--size-fluid-4);
-		padding-block-end: var(--size-fluid-2);
+		padding-block-end: var(--size-fluid-6);
 	}
 
 	section {
@@ -172,7 +175,7 @@
 		align-items: center;
 		gap: var(--size-fluid-2);
 		margin-block-start: 0;
-		margin-block-end: var(--size-fluid-1);
+		margin-block-end: var(--size-fluid-3);
 	}
 
 	ul > p {
@@ -210,10 +213,10 @@
 	}
 
 	.vote button.voted {
-		color: var(--pink-7);
+		color: var(--pink-8);
 		text-shadow:
 			0 0 3px var(--pink-5),
-			0 0 10px var(--pink-7);
+			0 0 8px var(--pink-6);
 	}
 
 	.vote ~ span {

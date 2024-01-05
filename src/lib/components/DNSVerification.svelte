@@ -19,6 +19,7 @@
 				if (res.ok) {
 					res.json().then(({ ok }) => {
 						bareDns = ok;
+						domain.bareDNSisVerified = ok;
 					});
 				}
 			});
@@ -36,6 +37,7 @@
 				if (res.ok) {
 					res.json().then(({ ok }) => {
 						wwwDns = ok;
+						domain.wwwDNSisVerified = ok;
 					});
 				}
 			});

@@ -156,7 +156,7 @@ export const vote = sqliteTable(
 		id: text('id')
 			.primaryKey()
 			.$defaultFn(() => createId()),
-		type: integer('type', { mode: 'number' }).notNull(), // +1, -1, 0 (or deleted?)
+		type: integer('type', { mode: 'number' }).notNull(), // +1, -1, 0
 		ideaId: text('idea_id')
 			.notNull()
 			.references(() => idea.id, { onUpdate: 'cascade', onDelete: 'cascade' }),

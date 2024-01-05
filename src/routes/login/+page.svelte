@@ -1,15 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
-	import { PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY } from '$env/static/public';
-	import { dev } from '$app/environment';
 
 	export let form: ActionData;
 </script>
-
-<svelte:head>
-	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-</svelte:head>
 
 <h1>Sign in</h1>
 <form method="post" use:enhance>
@@ -21,13 +15,6 @@
 	<input name="username" id="username" value={form?.username ?? ''} /><br />
 	<label for="password">Password</label>
 	<input type="password" name="password" id="password" /><br />
-	{#if !dev}
-		<div
-			class="cf-turnstile"
-			data-appearance="interaction-only"
-			data-sitekey={PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY}
-		></div>
-	{/if}
 	<button type="submit">Sign in</button>
 </form>
 <a href="/signup">Need an account? Sign up</a>

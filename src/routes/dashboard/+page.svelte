@@ -43,6 +43,13 @@
 			mightBeAbleToAddDomain = false;
 		}
 	});
+
+	$effect(() => {
+		if (form?.inserted) {
+			reason = '';
+			domain = '';
+		}
+	});
 </script>
 
 <svelte:head>
@@ -218,7 +225,7 @@
 						<a href="//{domain.name}{dev ? ':5173' : ''}">{domain.name}</a>
 					</td>
 					<td class="dns-column">
-						<DNSVerification {domain}></DNSVerification>
+						<DNSVerification bind:domain></DNSVerification>
 					</td>
 
 					<td class="wider">

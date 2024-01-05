@@ -8,6 +8,7 @@
 	import { queryParam, ssp } from 'sveltekit-search-params';
 	import { onMount } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
+	import DomainDiscovery from '$lib/components/DomainDiscovery.svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -86,6 +87,8 @@
 				<input type="submit" />
 			</form>
 		</section>
+
+		<DomainDiscovery discoveryDomains={data.discoveryDomains} other={true} />
 	</div>
 {:else}
 	<!-- 404 from +page.server -->
@@ -120,7 +123,7 @@
 
 	.wrapper {
 		padding-inline: var(--size-fluid-4);
-		padding-block-end: var(--size-fluid-2);
+		padding-block-end: var(--size-fluid-6);
 	}
 
 	section {

@@ -28,7 +28,7 @@
 {/if}
 
 {#if discoveryDomains.length}
-	<DomainDiscovery {discoveryDomains} />
+	<DomainDiscovery {discoveryDomains} other={false} />
 {/if}
 
 <!-- TODO: show some hot ideas -->

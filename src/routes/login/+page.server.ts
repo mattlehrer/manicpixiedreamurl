@@ -65,8 +65,8 @@ export const actions: Actions = {
 		}
 
 		const redirectTo = new URL('/check-session', dashboardSites[0]);
-		const redirectLocation = url.searchParams.get('redirect');
-		if (!redirectLocation) {
+		const domain = url.searchParams.get('redirect');
+		if (!domain) {
 			redirect(307, '/dashboard');
 		}
 
@@ -79,10 +79,10 @@ export const actions: Actions = {
 			await insertDownVote({ ideaId: downvote, userId: key.userId }).catch((e) => console.error(e));
 		}
 
-		redirectTo.searchParams.append('redirect', redirectLocation);
+		redirectTo.searchParams.append('redirect', domain);
 		const idea = url.searchParams.get('idea');
 		if (idea) {
-			const domainId = (await getDomainByName(dev ? redirectLocation.replace(':5173', '') : domain))?.id;
+			const domainId = (await getDomainByName(dev ? domain.replace(':5173', '') : domain))?.id;
 			if (!domainId) return redirect(302, redirectTo.href);
 			await insertIdea({ domainId, ownerId: session.user.userId, text: idea });
 		}

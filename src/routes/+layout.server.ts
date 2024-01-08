@@ -73,7 +73,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 		const discoveryDomains = await getRandomDomains(3, domainData.id);
 
 		return {
-			host: url.host,
+			host: url.host.toLowerCase().replace(/^www\./, ''),
 			pathname: url.pathname,
 			domain: domainData,
 			ideas: ideaData,

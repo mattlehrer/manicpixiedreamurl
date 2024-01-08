@@ -222,7 +222,7 @@
 			{#each data.domains as domain}
 				<tr>
 					<td>
-						<a href="//{domain.name}{dev ? ':5173' : ''}">{domain.name}</a>
+						<a target="_blank" href="//{domain.name}{dev ? ':5173' : ''}">{domain.name}</a>
 					</td>
 					<td class="dns-column">
 						<DNSVerification bind:domain></DNSVerification>

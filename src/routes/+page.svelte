@@ -152,7 +152,7 @@
 
 	label {
 		display: block;
-		font-color: var(--text-1);
+		color: var(--text-1);
 		font-weight: var(--font-weight-9);
 		font-size: var(--font-size-fluid-2);
 		margin-block: var(--size-fluid-2);

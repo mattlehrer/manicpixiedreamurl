@@ -17,7 +17,7 @@
 
 	let mightBeAbleToAddDomain = $state(true);
 
-	let updating: Record<string, 'updating' | 'updated' | 'error'> = {};
+	let updating: Record<string, 'updating' | 'updated' | 'error'> = $state({});
 
 	async function updateReason(domainId: string, domainReason: string) {
 		updating[domainId] = 'updating';

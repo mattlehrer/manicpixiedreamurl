@@ -15,14 +15,18 @@
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({ domain: domain.name, id: domain.id }),
-			}).then((res) => {
-				if (res.ok) {
-					res.json().then(({ ok }) => {
-						bareDns = ok;
-						domain.bareDNSisVerified = ok;
-					});
-				}
-			});
+			})
+				.then((res) => {
+					if (res.ok) {
+						res.json().then(({ ok }) => {
+							bareDns = ok;
+							domain.bareDNSisVerified = ok;
+						});
+					}
+				})
+				.catch((e) => {
+					console.log(e);
+				});
 		} else {
 			bareDns = true;
 		}
@@ -33,14 +37,18 @@
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({ domain: `www.${domain.name}`, id: domain.id }),
-			}).then((res) => {
-				if (res.ok) {
-					res.json().then(({ ok }) => {
-						wwwDns = ok;
-						domain.wwwDNSisVerified = ok;
-					});
-				}
-			});
+			})
+				.then((res) => {
+					if (res.ok) {
+						res.json().then(({ ok }) => {
+							wwwDns = ok;
+							domain.wwwDNSisVerified = ok;
+						});
+					}
+				})
+				.catch((e) => {
+					console.log(e);
+				});
 		} else {
 			wwwDns = true;
 		}

@@ -1,6 +1,7 @@
 @import 'open-props/style';
 @import 'open-props/normalize';
 @import 'open-props/buttons';
+@import 'open-props/colors-hsl';
 @import 'open-props/media';
 
 html,
@@ -122,10 +123,16 @@ input[type='submit'] {
 @media (--md-n-above) {
 	table#domains-table {
 		max-width: 70ch;
+		width: 100%;
+		border-collapse: revert;
 	}
 
 	table#domains-table :is(th:first-child, td:first-child, td.wider) {
 		padding-inline: var(--size-3);
+	}
+
+	table#domains-table textarea {
+		width: calc(100% - var(--size-5));
 	}
 
 	.dash-reason {

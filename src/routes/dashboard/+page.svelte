@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { confetti } from '@neoconfetti/svelte';
 	import { createDialog, melt } from '@melt-ui/svelte';
-	import { X } from 'lucide-svelte';
 	import DNSVerification from '$lib/components/DNSVerification.svelte';
 	import { enhance } from '$app/forms';
 	import DomainReason from '$lib/components/DomainReason.svelte';
 	import LoadingSpinner from '$lib/assets/LoadingSpinner.svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import { dev } from '$app/environment';
 	import { aRecord } from '$lib/config';
 
@@ -16,6 +15,13 @@
 
 	let reason: string = $state(form ? String(form?.reason) : '');
 	let domain: string = $state(form ? String(form?.domain) : '');
+
+	let removeDomain: { id: string; name: string } | null = $state(null);
+	$effect(() => {
+		if (!$deleteDomainDialogOpen) {
+			removeDomain = null;
+		}
+	});
 
 	let mightBeAbleToAddDomain = $state(true);
 
@@ -55,7 +61,7 @@
 
 	const {
 		elements: { trigger, overlay, content, title, description, close, portalled },
-		states: { open },
+		states: { open: deleteDomainDialogOpen },
 	} = createDialog({
 		role: 'alertdialog',
 		forceVisible: true,
@@ -225,12 +231,12 @@
 				<th>Domain</th>
 				<th class="dns-column">DNS</th>
 				<th class="wider">Reason</th>
-				<th>Remove</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
-			{#each data.domains as domain}
-				<tr>
+			{#each data.domains as domain (domain.id)}
+				<tr out:slide>
 					<td>
 						<a target="_blank" href="//{domain.name}{dev ? ':5173' : ''}">{domain.name}</a>
 					</td>
@@ -283,10 +289,21 @@
 					<td>
 						<button
 							use:melt={$trigger}
-							class="inline-flex items-center justify-center rounded-md bg-white px-4 py-2
-    font-medium leading-none text-magnum-700 shadow-lg hover:opacity-75"
+							class="remove-btn"
+							onclick={() => {
+								removeDomain = domain;
+							}}
 						>
-							Delete Item
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+							>
+							<span class="sr-only">Remove</span>
 						</button>
 					</td>
 				</tr>
@@ -296,8 +313,8 @@
 {/if}
 
 <div class="" use:melt={$portalled}>
-	{#if $open}
-		<div use:melt={$overlay} class="fixed inset-0 z-50 bg-black/50" />
+	{#if $deleteDomainDialogOpen}
+		<div use:melt={$overlay} class="dialog-bg" />
 		<div
 			class="dialog"
 			transition:fly={{
@@ -307,33 +324,49 @@
 			}}
 			use:melt={$content}
 		>
-			<h2 use:melt={$title} class="m-0 text-lg font-medium text-black">Are you sure you want to delete this?</h2>
-			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-zinc-600">
-				This action cannot be undone. This will permanently delete the item and remove it from our servers.
+			<h2 use:melt={$title} class="dialog-title">
+				Are you sure you want to remove {removeDomain?.name} from your account?
+			</h2>
+			<p use:melt={$description} class="dialog-description">
+				<strong>This action cannot be undone.</strong> This will permanently delete the domain and all associated ideas and
+				votes from our servers.
 			</p>
 
-			<div class="mt-6 flex justify-end gap-4">
-				<button
-					use:melt={$close}
-					class="inline-flex h-8 items-center justify-center rounded-[4px]
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+			<div class="dialog-actions">
+				<form
+					method="post"
+					action="?/deleteDomain"
+					use:enhance={() => {
+						return async ({ update }) => {
+							await update();
+							// TODO: show error, show success; add toasts
+							// if (result.type === 'success') {
+							$deleteDomainDialogOpen = false;
+							// }
+						};
+					}}
 				>
-					Cancel
-				</button>
-				<form method="post" action="?/deleteDomain" use:enhance>
-					<input type="hidden" name="domainId" value={domain.id} />
-					<input type="submit" value="Remove" />
+					<button use:melt={$close} class="dialog-secondary"> Cancel </button>
+					<input type="hidden" name="domainId" value={removeDomain?.id} />
+					<input
+						type="submit"
+						class="dialog-primary"
+						value="Permanently delete {removeDomain?.name}"
+						disabled={!removeDomain}
+					/>
 				</form>
 			</div>
 
-			<button
-				use:melt={$close}
-				aria-label="Close"
-				class="absolute right-[10px] top-[10px] inline-flex h-6 w-6
-                appearance-none items-center justify-center rounded-full text-magnum-800
-                hover:bg-magnum-100 focus:shadow-magnum-400"
-			>
-				<X class="square-4" />
+			<button use:melt={$close} aria-label="Close" class="dialog-close">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+				>
 			</button>
 		</div>
 	{/if}
@@ -365,18 +398,25 @@
 	}
 	table {
 		margin-block-start: var(--size-6);
-		width: 100%;
+		border-radius: 0;
+		max-width: 100%;
+		border-collapse: collapse;
+		border: 0;
+		--nice-inner-radius: 0;
 	}
 
-	td > textarea {
-		padding: 0;
-		margin: 0;
+	tbody tr {
+		border-bottom: 1px solid var(--surface-2);
 	}
 
 	th:first-child,
 	td:first-child {
 		width: 8rem;
 		text-align: left;
+		padding-inline: var(--size-1);
+	}
+
+	tr td:last-child {
 		padding-inline: var(--size-1);
 	}
 
@@ -387,15 +427,14 @@
 	.wider {
 		min-width: 100%;
 		text-align: left;
-		padding-inline: var(--size-2);
+		padding-inline: var(--size-1);
 		display: flex;
 		align-items: center;
-		gap: var(--size-2);
+		position: relative;
 	}
 
 	.wider textarea {
-		margin-inline-start: calc(-1 * var(--size-2));
-		width: 85%;
+		/* margin-inline-start: calc(-1 * var(--size-2)); */
 	}
 
 	.dash-reason {
@@ -408,10 +447,42 @@
 	}
 
 	td textarea ~ svg:not(.spin) {
-		display: inline-block;
+		position: absolute;
+		right: var(--size-2);
 		animation:
 			1s var(--animation-fade-in) forwards,
 			6s var(--animation-fade-out) forwards;
+	}
+
+	.remove-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-2);
+		padding: var(--size-1) var(--size-2);
+		background-color: var(--surface-1);
+		font-weight: var(--font-weight-2);
+		color: var(--red-6);
+		transition: var(--transition-shadow);
+		width: var(--size-3);
+		height: var(--size-3);
+		padding: 0;
+		background-color: inherit;
+		border: none;
+		box-shadow: none;
+	}
+
+	.remove-btn:hover {
+		--_highlight-size: var(--size-1);
+		opacity: 0.75;
+	}
+
+	.dialog-bg {
+		/* fixed inset-0 z-50 bg-black/50 */
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		background-color: hsl(var(--gray-9-hsl) / 50%);
 	}
 
 	.dialog {
@@ -423,9 +494,108 @@
 		width: 90vw;
 		max-width: 450px;
 		transform: translate(-50%, -50%);
-		border-radius: var(--radius-3);
+		border-radius: var(--radius-2);
 		background-color: var(--surface-1);
 		padding: var(--size-3);
 		box-shadow: var(--shadow-2);
+	}
+
+	.dialog-title {
+		margin: 0;
+		padding-inline-end: var(--size-5);
+		font-size: var(--font-size-3);
+		line-height: var(--font-lineheight-1);
+		font-weight: var(--font-weight-6);
+		color: rgb(var(--text-1) / 1);
+	}
+
+	.dialog-description {
+		/* margin-bottom: 1.25rem;
+		margin-top: 0.5rem; */
+		margin-block-start: var(--size-3);
+		margin-block-end: var(--size-4);
+		line-height: var(--font-lineheight-2);
+		font-size: var(--font-size-2);
+
+		color: var(--text-2);
+	}
+
+	.dialog-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 1rem;
+
+		margin-top: 1.5rem;
+	}
+
+	.dialog-actions form {
+		margin: 0;
+		display: flex;
+		flex-direction: row;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	.dialog-actions form input[type='submit'] {
+		margin: 0;
+	}
+
+	.dialog-actions button,
+	.dialog-actions input[type='submit'] {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+
+		height: 2rem;
+
+		border-radius: var(--radius-2);
+
+		padding: var(--size-1) var(--size-2);
+
+		font-weight: var(--font-weight-4);
+		line-height: 1;
+	}
+
+	.dialog-actions button.dialog-secondary {
+		background-color: rgb(var(--color-zinc-100) / 1);
+
+		color: var(--blue-6);
+	}
+
+	.dialog-actions input[type='submit'].dialog-primary {
+		background-color: hsl(var(--red-1-hsl) / 0.5);
+
+		color: hsl(var(--red-9-hsl) / 1);
+	}
+
+	.dialog-close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+
+		position: absolute;
+		right: 10px;
+		top: 10px;
+
+		appearance: none;
+
+		height: var(--size-5);
+		width: var(--size-5);
+
+		border-radius: var(--radius-6);
+
+		color: var(--text-2);
+		padding: 0;
+		background-color: inherit;
+		border: none;
+		box-shadow: none;
+	}
+
+	.dialog-close:hover {
+		background-color: var(--surface-2);
+	}
+
+	.dialog-close:focus {
+		box-shadow: 0px 0px 0px 3px rgb(var(--color-magnum-400) / 1);
 	}
 </style>

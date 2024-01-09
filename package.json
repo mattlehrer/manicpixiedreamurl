@@ -18,6 +18,8 @@
 		"db:push": "drizzle-kit push:sqlite"
 	},
 	"devDependencies": {
+		"@melt-ui/pp": "^0.3.0",
+		"@melt-ui/svelte": "^0.67.0",
 		"@playwright/test": "^1.40.1",
 		"@sveltejs/adapter-node": "^2.0.0",
 		"@sveltejs/kit": "^2.0.6",

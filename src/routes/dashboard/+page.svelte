@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { confetti } from '@neoconfetti/svelte';
+	import { createDialog, melt } from '@melt-ui/svelte';
+	import { X } from 'lucide-svelte';
 	import DNSVerification from '$lib/components/DNSVerification.svelte';
 	import { enhance } from '$app/forms';
 	import DomainReason from '$lib/components/DomainReason.svelte';
 	import LoadingSpinner from '$lib/assets/LoadingSpinner.svelte';
-	import { fade } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import { dev } from '$app/environment';
 	import { aRecord } from '$lib/config';
 
@@ -49,6 +51,14 @@
 			reason = '';
 			domain = '';
 		}
+	});
+
+	const {
+		elements: { trigger, overlay, content, title, description, close, portalled },
+		states: { open },
+	} = createDialog({
+		role: 'alertdialog',
+		forceVisible: true,
 	});
 </script>
 
@@ -271,16 +281,63 @@
 					</td>
 					<!-- TODO: make this a small button and add an "are you sure? this action cannot be undone." dialog to confirm-->
 					<td>
-						<form method="post" action="?/deleteDomain" use:enhance>
-							<input type="hidden" name="domainId" value={domain.id} />
-							<input type="submit" value="Remove" />
-						</form>
+						<button
+							use:melt={$trigger}
+							class="inline-flex items-center justify-center rounded-md bg-white px-4 py-2
+    font-medium leading-none text-magnum-700 shadow-lg hover:opacity-75"
+						>
+							Delete Item
+						</button>
 					</td>
 				</tr>
 			{/each}
 		</tbody>
 	</table>
 {/if}
+
+<div class="" use:melt={$portalled}>
+	{#if $open}
+		<div use:melt={$overlay} class="fixed inset-0 z-50 bg-black/50" />
+		<div
+			class="dialog"
+			transition:fly={{
+				duration: 150,
+				y: 8,
+				// start: 0.96,
+			}}
+			use:melt={$content}
+		>
+			<h2 use:melt={$title} class="m-0 text-lg font-medium text-black">Are you sure you want to delete this?</h2>
+			<p use:melt={$description} class="mb-5 mt-2 leading-normal text-zinc-600">
+				This action cannot be undone. This will permanently delete the item and remove it from our servers.
+			</p>
+
+			<div class="mt-6 flex justify-end gap-4">
+				<button
+					use:melt={$close}
+					class="inline-flex h-8 items-center justify-center rounded-[4px]
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+				>
+					Cancel
+				</button>
+				<form method="post" action="?/deleteDomain" use:enhance>
+					<input type="hidden" name="domainId" value={domain.id} />
+					<input type="submit" value="Remove" />
+				</form>
+			</div>
+
+			<button
+				use:melt={$close}
+				aria-label="Close"
+				class="absolute right-[10px] top-[10px] inline-flex h-6 w-6
+                appearance-none items-center justify-center rounded-full text-magnum-800
+                hover:bg-magnum-100 focus:shadow-magnum-400"
+			>
+				<X class="square-4" />
+			</button>
+		</div>
+	{/if}
+</div>
 
 <style lang="postcss">
 	.confetti {
@@ -355,5 +412,20 @@
 		animation:
 			1s var(--animation-fade-in) forwards,
 			6s var(--animation-fade-out) forwards;
+	}
+
+	.dialog {
+		position: fixed;
+		left: 50%;
+		top: 50%;
+		z-index: 50;
+		max-height: 85vh;
+		width: 90vw;
+		max-width: 450px;
+		transform: translate(-50%, -50%);
+		border-radius: var(--radius-3);
+		background-color: var(--surface-1);
+		padding: var(--size-3);
+		box-shadow: var(--shadow-2);
 	}
 </style>

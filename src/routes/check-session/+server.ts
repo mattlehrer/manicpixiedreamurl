@@ -8,15 +8,14 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!domain) {
 		redirect(307, '/');
 	}
-	const session = await locals.auth.validate();
 	const redirectTo = new URL('/', `${url.protocol}//${domain}`);
-	if (!session) {
+	if (!locals.session) {
 		redirectTo.searchParams.append('token', createId());
 		return redirect(307, redirectTo.href);
 	} else {
 		// add short-lived token to db for session
 		const token = createId();
-		sessionTokens.set(token, session.sessionId);
+		sessionTokens.set(token, locals.session.id);
 		const idea = url.searchParams.get('idea');
 		redirectTo.searchParams.append('token', token);
 		if (idea) redirectTo.searchParams.append('idea', idea);

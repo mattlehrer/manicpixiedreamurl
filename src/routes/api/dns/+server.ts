@@ -5,8 +5,7 @@ import { aRecord } from '$lib/config';
 import { getDomainById, updateDomain } from '$lib/server/handlers';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	const session = await locals.auth?.validate();
-	if (!session) return error(401);
+	if (!locals.session) return error(401);
 
 	const { domain, id } = await request.json();
 	if (!domain || typeof domain !== 'string') return error(400, { message: 'Bad domain' });
@@ -14,7 +13,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const d = await getDomainById(id);
 	if (!d) return error(404, { message: 'Not found' });
 	if (d.name !== domain && d.name !== domain.replace(/^www\./, '')) return error(400, { message: 'Forbidden' });
-	if (d.ownerId !== session.user.userId) return error(400, { message: 'Forbidden' });
+	if (d.ownerId !== locals.session.userId) return error(400, { message: 'Forbidden' });
 
 	const dns = await getDNSData(domain);
 

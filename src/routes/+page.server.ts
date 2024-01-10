@@ -15,18 +15,17 @@ import { isProhibitedTextWithReasons } from '$lib/server/moderation';
 
 export const actions: Actions = {
 	addSuggestion: async ({ url, locals, request }) => {
-		const session = await locals.auth.validate();
 		const data = await request.formData();
 		const idea = data && data.get('idea');
 
-		if (!session) {
+		if (!locals.session || !locals.user) {
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
 			if (idea && typeof idea === 'string') redirectTo.searchParams.append('idea', idea);
 			redirect(302, redirectTo);
 		}
 
-		if (!session.user.hasVerifiedEmail) {
+		if (!locals.user.hasVerifiedEmail) {
 			const redirectTo = new URL('/dashboard', dashboardSites[0]);
 			return redirect(302, redirectTo);
 		}
@@ -51,7 +50,7 @@ export const actions: Actions = {
 			if (flagged) {
 				console.log({ newIdea, flagged, reasons });
 				await insertFlaggedIdea({
-					ownerId: session.user.userId,
+					ownerId: locals.user.id,
 					domainId,
 					text: newIdea,
 					moderationData: { ...reasons, flagged },
@@ -64,7 +63,7 @@ export const actions: Actions = {
 		}
 
 		const inserted = await insertIdea({
-			ownerId: session.user.userId,
+			ownerId: locals.session.userId,
 			domainId,
 			text: newIdea,
 		});
@@ -72,18 +71,17 @@ export const actions: Actions = {
 		return { inserted };
 	},
 	downvote: async ({ url, locals, request }) => {
-		const session = await locals.auth.validate();
 		const data = await request.formData();
 		const ideaId = data && data.get('idea');
 
-		if (!session) {
+		if (!locals.session || !locals.user) {
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
 			if (ideaId && typeof ideaId === 'string') redirectTo.searchParams.append('downvote', ideaId);
 			redirect(302, redirectTo);
 		}
 
-		if (!session.user.hasVerifiedEmail) {
+		if (!locals.user.hasVerifiedEmail) {
 			// TODO: add toast to verify email with link to dashboard to resend
 			const redirectTo = new URL('/dashboard', dashboardSites[0]);
 			return redirect(302, redirectTo);
@@ -92,26 +90,25 @@ export const actions: Actions = {
 		if (!ideaId || typeof ideaId !== 'string') return fail(400, { message: 'Invalid request' });
 
 		const inserted = await insertDownVote({
-			userId: session.user.userId,
+			userId: locals.user.id,
 			ideaId,
 		});
 
 		return { inserted };
 	},
 	upvote: async ({ url, locals, request }) => {
-		const session = await locals.auth.validate();
 		const data = await request.formData();
 		const ideaId = data && data.get('idea');
 
-		if (!session) {
-			console.log({ redirecting: true, session });
+		if (!locals.session || !locals.user) {
+			console.log({ redirecting: true, session: locals.session });
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
 			if (ideaId && typeof ideaId === 'string') redirectTo.searchParams.append('upvote', ideaId);
 			redirect(302, redirectTo);
 		}
 
-		if (!session.user.hasVerifiedEmail) {
+		if (!locals.user.hasVerifiedEmail) {
 			// TODO: add toast to verify email with link to dashboard to resend
 			const redirectTo = new URL('/dashboard', dashboardSites[0]);
 			return redirect(302, redirectTo);
@@ -120,19 +117,18 @@ export const actions: Actions = {
 		if (!ideaId || typeof ideaId !== 'string') return fail(400, { message: 'Invalid request' });
 
 		const inserted = await insertUpVote({
-			userId: session.user.userId,
+			userId: locals.user.id,
 			ideaId,
 		});
 
 		return { inserted };
 	},
 	unvote: async ({ url, locals, request }) => {
-		const session = await locals.auth.validate();
 		const data = await request.formData();
 		const ideaId = data && data.get('idea');
 
-		if (!session) {
-			console.log({ redirecting: true, session });
+		if (!locals.session || !locals.user) {
+			console.log({ redirecting: true, session: locals.session });
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
 			redirect(302, redirectTo);
@@ -141,19 +137,18 @@ export const actions: Actions = {
 		if (!ideaId || typeof ideaId !== 'string') return fail(400, { message: 'Invalid request' });
 
 		const inserted = await removeVote({
-			userId: session.user.userId,
+			userId: locals.user.id,
 			ideaId,
 		});
 
 		return { inserted };
 	},
 	resendVerification: async ({ locals }) => {
-		const session = await locals.auth.validate();
-		if (!session) return fail(401);
-		if (session.user.hasVerifiedEmail) return fail(400, { alreadyVerified: true });
+		if (!locals.session || !locals.user) return fail(401);
+		if (locals.user.hasVerifiedEmail) return fail(400, { alreadyVerified: true });
 
 		let error;
-		await sendVerificationEmail({ email: session.user.email, id: session.user.userId }).catch((e) => {
+		await sendVerificationEmail({ email: locals.user.email, id: locals.user.id }).catch((e) => {
 			console.error(e);
 			error = e;
 		});

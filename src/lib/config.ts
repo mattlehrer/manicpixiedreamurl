@@ -6,6 +6,6 @@ export const dashboardSites = dev
 
 export const aRecord = dev ? '127.0.0.1' : '95.217.212.108';
 
-export const confirmationEmailAddress = 'support@manicpixiedreamurl.com';
+export const supportEmailAddress = 'support@manicpixiedreamurl.com';
 
 export const authSessionCookieName = 'mpdu_session';

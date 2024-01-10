@@ -1,14 +1,19 @@
-import { auth } from '$lib/server/lucia';
-import { LuciaError } from 'lucia';
+import { lucia } from '$lib/server/lucia';
+import { Argon2id } from 'oslo/password';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { dashboardSites } from '$lib/config';
-import { getDomainByName, insertDownVote, insertIdea, insertUpVote } from '$lib/server/handlers';
+import {
+	getDomainByName,
+	getUserByUsernameWithPassword,
+	insertDownVote,
+	insertIdea,
+	insertUpVote,
+} from '$lib/server/handlers';
 import { dev } from '$app/environment';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const session = await locals.auth?.validate();
-	if (session) {
+	if (locals.user) {
 		const domain = url.searchParams.get('redirect');
 		if (!domain) {
 			redirect(307, '/dashboard');
@@ -24,7 +29,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals, url }) => {
+	default: async ({ request, url, cookies }) => {
 		const formData = await request.formData();
 
 		const username = formData.get('username');
@@ -38,31 +43,34 @@ export const actions: Actions = {
 				invalidPassword: true,
 			});
 		}
-		let key;
-		let session;
-		try {
-			// find user by key
-			// and validate password
-			key = await auth.useKey('username', username.toLowerCase(), password);
-			session = await auth.createSession({
-				userId: key.userId,
-				attributes: {},
-			});
-			locals.auth.setSession(session); // set session cookie
-			await auth.deleteDeadUserSessions(key.userId);
-		} catch (e) {
-			console.error(e);
-			if (e instanceof LuciaError && (e.message === 'AUTH_INVALID_KEY_ID' || e.message === 'AUTH_INVALID_PASSWORD')) {
-				// user does not exist
-				// or invalid password
-				return fail(400, {
-					message: 'Incorrect username or password',
-				});
-			}
-			return fail(500, {
-				serverError: true,
+
+		const existingUser = await getUserByUsernameWithPassword(username);
+		if (!existingUser) {
+			return fail(400, {
+				message: 'Incorrect username or password',
 			});
 		}
+
+		if (!existingUser.password) {
+			return fail(500, {
+				message:
+					'You created your account before we changed authentication techniques. Please request a password reset email.',
+			});
+		}
+
+		const validPassword = await new Argon2id().verify(existingUser.password.hashedPassword, password);
+		if (!validPassword) {
+			return fail(400, {
+				message: 'Incorrect username or password',
+			});
+		}
+
+		const session = await lucia.createSession(existingUser.id, {});
+		const sessionCookie = lucia.createSessionCookie(session.id);
+		cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: '/',
+			...sessionCookie.attributes,
+		});
 
 		const redirectTo = new URL('/check-session', dashboardSites[0]);
 		const domain = url.searchParams.get('redirect');
@@ -72,11 +80,11 @@ export const actions: Actions = {
 
 		const upvote = url.searchParams.get('upvote');
 		if (upvote) {
-			await insertUpVote({ ideaId: upvote, userId: key.userId }).catch((e) => console.error(e));
+			await insertUpVote({ ideaId: upvote, userId: existingUser.id }).catch((e) => console.error(e));
 		}
 		const downvote = url.searchParams.get('downvote');
 		if (downvote) {
-			await insertDownVote({ ideaId: downvote, userId: key.userId }).catch((e) => console.error(e));
+			await insertDownVote({ ideaId: downvote, userId: existingUser.id }).catch((e) => console.error(e));
 		}
 
 		redirectTo.searchParams.append('redirect', domain);
@@ -84,7 +92,7 @@ export const actions: Actions = {
 		if (idea) {
 			const domainId = (await getDomainByName(dev ? domain.replace(':5173', '') : domain))?.id;
 			if (!domainId) return redirect(302, redirectTo.href);
-			await insertIdea({ domainId, ownerId: session.user.userId, text: idea });
+			await insertIdea({ domainId, ownerId: existingUser.id, text: idea });
 		}
 
 		redirect(302, redirectTo.href);

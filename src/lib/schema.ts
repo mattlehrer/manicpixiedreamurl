@@ -1,12 +1,13 @@
 import { relations, sql } from 'drizzle-orm';
-import { text, sqliteTable, blob, integer, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { text, sqliteTable, integer, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { createId } from '@paralleldrive/cuid2';
 import { uid } from 'uid/secure';
+import { TimeSpan, createDate } from 'oslo';
 
 const createVerificationCode = () => uid(64);
 
 export const user = sqliteTable('user', {
-	id: text('id').primaryKey(),
+	id: text('id').notNull().primaryKey(),
 	email: text('email').notNull().unique(),
 	username: text('username').notNull().unique(),
 	hasVerifiedEmail: integer('has_verified_email', { mode: 'boolean' }).default(false),
@@ -15,11 +16,15 @@ export const user = sqliteTable('user', {
 	// other user attributes
 });
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many, one }) => ({
 	domain: many(domain),
 	ideas: many(idea),
 	flaggedIdeas: many(flaggedIdea),
 	votes: many(vote),
+	password: one(password, {
+		fields: [user.id],
+		references: [password.userId],
+	}),
 }));
 
 export const emailVerificationCode = sqliteTable('email_verification', {
@@ -40,26 +45,52 @@ export const emailVerificationRelations = relations(emailVerificationCode, ({ on
 	}),
 }));
 
-export const session = sqliteTable('user_session', {
-	id: text('id').primaryKey(),
+export const passwordResetToken = sqliteTable('password_reset_token', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => createId()),
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
-	activeExpires: blob('active_expires', {
-		mode: 'bigint',
-	}).notNull(),
-	idleExpires: blob('idle_expires', {
-		mode: 'bigint',
-	}).notNull(),
+	token: text('token').$defaultFn(() => createVerificationCode()),
+	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+	expiresAt: text('expires_at')
+		.notNull()
+		.$defaultFn(() => String(createDate(new TimeSpan(2, 'h')))),
 });
 
-export const key = sqliteTable('user_key', {
-	id: text('id').primaryKey(),
+export const passwordResetTokenRelations = relations(passwordResetToken, ({ one }) => ({
+	user: one(user, {
+		fields: [passwordResetToken.userId],
+		references: [user.id],
+	}),
+}));
+
+export const session = sqliteTable('session', {
+	id: text('id').notNull().primaryKey(),
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
-	hashedPassword: text('hashed_password'),
+	expiresAt: integer('expires_at').notNull(),
 });
+
+export const password = sqliteTable('password', {
+	userId: text('user_id')
+		.notNull()
+		.primaryKey()
+		.unique()
+		.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+	hashedPassword: text('hashed_password').notNull(),
+	createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const passwordRelations = relations(password, ({ one }) => ({
+	user: one(user, {
+		fields: [password.userId],
+		references: [user.id],
+	}),
+}));
 
 export const domain = sqliteTable(
 	'domain',

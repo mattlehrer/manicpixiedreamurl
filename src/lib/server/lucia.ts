@@ -1,33 +1,39 @@
-import { lucia } from 'lucia';
-import { sveltekit } from 'lucia/middleware';
-import { betterSqlite3 } from '@lucia-auth/adapter-sqlite';
+import { Lucia } from 'lucia';
 import { dev } from '$app/environment';
 import { sqliteDatabase } from './db';
 import { authSessionCookieName } from '$lib/config';
+import { DrizzleSQLiteAdapter } from '@lucia-auth/adapter-drizzle';
 
-export const auth = lucia({
-	env: dev ? 'DEV' : 'PROD',
-	middleware: sveltekit(),
-	adapter: betterSqlite3(sqliteDatabase, {
-		user: 'user',
-		key: 'user_key',
-		session: 'user_session',
-	}),
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { session, user } from '$lib/schema';
+import type { User } from './handlers';
+
+const db = drizzle(sqliteDatabase);
+
+const adapter = new DrizzleSQLiteAdapter(db, session, user);
+
+export const lucia = new Lucia(adapter, {
 	sessionCookie: {
 		name: authSessionCookieName,
 		attributes: {
+			secure: !dev,
 			sameSite: 'lax',
 			path: '/',
 		},
 	},
 
-	getUserAttributes: (data) => {
+	getUserAttributes: (attributes) => {
 		return {
-			username: data.username,
-			email: data.email,
-			hasVerifiedEmail: !!data.has_verified_email,
+			username: attributes.username,
+			email: attributes.email,
+			hasVerifiedEmail: !!attributes.hasVerifiedEmail,
 		};
 	},
 });
 
-export type Auth = typeof auth;
+declare module 'lucia' {
+	interface Register {
+		Lucia: typeof lucia;
+		DatabaseUserAttributes: Omit<User, 'id'>;
+	}
+}

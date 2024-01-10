@@ -1,16 +1,24 @@
-import { auth } from '$lib/server/lucia';
+import { lucia } from '$lib/server/lucia';
 import isEmail from 'validator/lib/isEmail';
 import { fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import Database from 'better-sqlite3';
 import { sendVerificationEmail } from '$lib/server/email';
 import { dashboardSites } from '$lib/config';
-import { getDomainByName, insertDownVote, insertIdea, insertUpVote } from '$lib/server/handlers';
+import {
+	getDomainByName,
+	insertDownVote,
+	insertIdea,
+	insertPassword,
+	insertUpVote,
+	insertUser,
+} from '$lib/server/handlers';
 import { dev } from '$app/environment';
+import { Argon2id } from 'oslo/password';
+import { generateId } from 'lucia';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const session = await locals.auth?.validate();
-	if (session) {
+	if (locals.user) {
 		const domain = url.searchParams.get('redirect');
 		if (!domain) redirect(307, '/');
 		const redirectTo = new URL('/check-session', dashboardSites[0]);
@@ -20,17 +28,17 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		if (idea) {
 			const domainId = (await getDomainByName(dev ? domain.replace(':5173', '') : domain))?.id;
 			if (!domainId) return redirect(302, redirectTo.href);
-			await insertIdea({ domainId, ownerId: session.user.userId, text: idea });
+			await insertIdea({ domainId, ownerId: locals.user.id, text: idea });
 		}
 
 		const downvote = url.searchParams.get('downvote');
 		if (downvote) {
-			await insertDownVote({ ideaId: downvote, userId: session.user.userId });
+			await insertDownVote({ ideaId: downvote, userId: locals.user.id });
 		}
 
 		const upvote = url.searchParams.get('upvote');
 		if (upvote) {
-			await insertUpVote({ ideaId: upvote, userId: session.user.userId });
+			await insertUpVote({ ideaId: upvote, userId: locals.user.id });
 		}
 
 		redirect(302, redirectTo.href);
@@ -52,7 +60,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals, url }) => {
+	default: async ({ request, url, cookies }) => {
 		const formData = await request.formData();
 
 		const username = formData.get('username');
@@ -82,26 +90,22 @@ export const actions: Actions = {
 		}
 		try {
 			console.debug('creating user');
-			const user = await auth.createUser({
-				key: {
-					providerId: 'username', // auth method
-					providerUserId: username.toLowerCase(), // unique id when using "username" auth method
-					password, // hashed by Lucia
-				},
-				attributes: {
-					email,
-					username,
-				},
-			});
-			console.debug({ user });
-			const session = await auth.createSession({
-				userId: user.userId,
-				attributes: {},
-			});
-			locals.auth.setSession(session); // set session cookie
 
-			// send verification email
-			await sendVerificationEmail({ ...user, id: user.userId });
+			const userId = generateId(15);
+			const hashedPassword = await new Argon2id().hash(password);
+
+			await insertUser({ id: userId, username, email });
+
+			await insertPassword({ userId, hashedPassword });
+
+			const session = await lucia.createSession(userId, {});
+			const sessionCookie = lucia.createSessionCookie(session.id);
+			cookies.set(sessionCookie.name, sessionCookie.value, {
+				path: '/',
+				...sessionCookie.attributes,
+			});
+
+			await sendVerificationEmail({ email, id: userId });
 		} catch (e) {
 			console.error(e);
 			if (e instanceof Database.SqliteError && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -123,6 +127,8 @@ export const actions: Actions = {
 		redirectTo.searchParams.append('redirect', redirectLocation);
 		const idea = url.searchParams.get('idea');
 		if (idea) redirectTo.searchParams.append('idea', idea);
+
+		// Can't submit vote before email verification so not doing this
 		// const upvote = url.searchParams.get('upvote');
 		// if (upvote) redirectTo.searchParams.append('voted', '1');
 		// const downvote = url.searchParams.get('downvote');

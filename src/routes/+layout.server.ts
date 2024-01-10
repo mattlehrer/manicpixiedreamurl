@@ -4,7 +4,7 @@ import type { LayoutServerLoad } from './$types';
 import { getDomainByName, getIdeasWithVotesForDomainId, getRandomDomains } from '$lib/server/handlers';
 import { sessionTokens } from '$lib/server/session_token';
 import { dev } from '$app/environment';
-import { auth } from '$lib/server/lucia';
+import { lucia as auth } from '$lib/server/lucia';
 
 const cookieOpts = {
 	path: '/',
@@ -27,11 +27,11 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 					cookies.set(authSessionCookieName, sessionId, cookieOpts);
 					cookies.delete('mpdu_session_checked', cookieOpts);
 					sessionTokens.delete(token);
-					const session = await auth.getSession(sessionId);
+					const { session, user } = await auth.validateSession(sessionId);
 					if (session) {
 						loggedIn = true;
-						userId = session.user.userId;
-						isEmailVerified = session.user.hasVerifiedEmail;
+						userId = user.id;
+						isEmailVerified = user.hasVerifiedEmail;
 					}
 				} else {
 					cookies.set('mpdu_session_checked', 'true', cookieOpts);
@@ -45,11 +45,10 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 				}
 			}
 		} else {
-			const session = await locals.auth.validate();
-			if (session) {
+			if (locals.session && locals.user) {
 				loggedIn = true;
-				userId = session.user.userId;
-				isEmailVerified = session.user.hasVerifiedEmail;
+				userId = locals.user.id;
+				isEmailVerified = locals.user.hasVerifiedEmail;
 			}
 		}
 
@@ -85,15 +84,14 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 		};
 	}
 
-	const session = await locals.auth?.validate();
 	const discoveryDomains = await getRandomDomains(3);
 
 	return {
 		origin: url.origin,
 		host: url.host,
 		pathname: url.pathname,
-		username: session?.user.username,
-		loggedIn: !!session,
+		username: locals.user?.username,
+		loggedIn: !!locals.session,
 		discoveryDomains,
 	};
 };

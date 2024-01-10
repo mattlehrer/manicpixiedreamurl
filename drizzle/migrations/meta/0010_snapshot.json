@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "ecab2a37-aaa4-419f-819f-06954ab77b9d",
-  "prevId": "f3ce9060-9957-4eec-aa46-5a7e3b5699b1",
+  "id": "bf79bf55-678d-4db3-ab89-55eea8e200cb",
+  "prevId": "ecab2a37-aaa4-419f-819f-06954ab77b9d",
   "tables": {
     "domain": {
       "name": "domain",
@@ -352,6 +352,22 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {
@@ -367,6 +383,65 @@
         "password_user_id_user_id_fk": {
           "name": "password_user_id_user_id_fk",
           "tableFrom": "password",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "password_reset_token": {
+      "name": "password_reset_token",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "password_reset_token_user_id_user_id_fk": {
+          "name": "password_reset_token_user_id_user_id_fk",
+          "tableFrom": "password_reset_token",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"

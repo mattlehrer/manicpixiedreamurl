@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import Logo from '$lib/assets/mpdu_logo.svelte';
 
-	export let username: string;
+	export let username: string | undefined;
 </script>
 
 <header>

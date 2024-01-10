@@ -1,23 +1,22 @@
 import { ParseResultType, parseDomain } from 'parse-domain';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { auth } from '$lib/server/lucia';
 import { deleteDomain, getDomainsForUser, insertDomain } from '$lib/server/handlers';
 import { dev } from '$app/environment';
 import { sendVerificationEmail } from '$lib/server/email';
+import { lucia } from '$lib/server/lucia';
 
 const MAX_DOMAINS = 3;
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const session = await locals.auth?.validate();
-	if (!session) redirect(302, '/login');
+	if (!locals.session || !locals.user) redirect(302, '/login');
 
-	const domains = await getDomainsForUser(session.user.userId);
+	const domains = await getDomainsForUser(locals.user.id);
 
 	return {
-		userId: session.user.userId,
-		username: session.user.username,
-		hasVerifiedEmail: session.user.hasVerifiedEmail,
+		userId: locals.user.id,
+		username: locals.user.username,
+		hasVerifiedEmail: locals.user.hasVerifiedEmail,
 		domains,
 		maxDomains: MAX_DOMAINS,
 	};
@@ -25,11 +24,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	addDomain: async ({ locals, request }) => {
-		const session = await locals.auth.validate();
-		if (!session) return fail(401);
+		if (!locals.session || !locals.user) return fail(401);
 
 		// check if user is allowed to add domains
-		const domains = await getDomainsForUser(session.user.userId);
+		const domains = await getDomainsForUser(locals.user.id);
 		if (domains.length >= MAX_DOMAINS) return fail(400, { tooMany: MAX_DOMAINS });
 		if (!domains.every((d) => d.bareDNSisVerified && d.wwwDNSisVerified)) return fail(400, { dnsNotVerified: true });
 
@@ -50,7 +48,7 @@ export const actions: Actions = {
 
 		try {
 			await insertDomain({
-				ownerId: session.user.userId,
+				ownerId: locals.user.id,
 				name: domain,
 				reason,
 				isActive: true,
@@ -63,8 +61,7 @@ export const actions: Actions = {
 		}
 	},
 	deleteDomain: async ({ locals, request }) => {
-		const session = await locals.auth.validate();
-		if (!session) return fail(401);
+		if (!locals.session) return fail(401);
 
 		const data = await request.formData();
 		const domainId = data.get('domainId');
@@ -72,7 +69,7 @@ export const actions: Actions = {
 		if (!domainId || typeof domainId !== 'string') return fail(400, { domainId, invalid: true });
 
 		try {
-			const deleted = await deleteDomain(domainId, session.user.userId);
+			const deleted = await deleteDomain(domainId, locals.session.userId);
 			console.log({ deleted });
 			return { deleted };
 		} catch (error) {
@@ -81,12 +78,11 @@ export const actions: Actions = {
 		}
 	},
 	resendVerification: async ({ locals }) => {
-		const session = await locals.auth.validate();
-		if (!session) return fail(401);
-		if (session.user.hasVerifiedEmail) return fail(400, { alreadyVerified: true });
+		if (!locals.session || !locals.user) return fail(401);
+		if (locals.user.hasVerifiedEmail) return fail(400, { alreadyVerified: true });
 
 		let error;
-		await sendVerificationEmail({ email: session.user.email, id: session.user.userId }).catch((e) => {
+		await sendVerificationEmail({ email: locals.user.email, id: locals.user.id }).catch((e) => {
 			console.error(e);
 			error = e;
 		});
@@ -94,14 +90,16 @@ export const actions: Actions = {
 
 		return { sent: true };
 	},
-	logout: async ({ locals }) => {
-		const session = await locals.auth.validate();
-		if (session) {
-			await auth.invalidateSession(session.sessionId); // invalidate session
+	logout: async ({ locals, cookies }) => {
+		if (!locals.session) {
+			return fail(401);
 		}
-		locals.auth.setSession(null); // remove cookie
-		await auth.deleteDeadUserSessions(session?.user?.userId); // cleanup sessions
-
-		redirect(302, '/login'); // redirect to login page
+		await lucia.invalidateSession(locals.session.id);
+		const sessionCookie = lucia.createBlankSessionCookie();
+		cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: '/',
+			...sessionCookie.attributes,
+		});
+		return redirect(302, '/login');
 	},
 };

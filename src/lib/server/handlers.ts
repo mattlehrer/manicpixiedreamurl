@@ -1,15 +1,68 @@
-import { domain, emailVerificationCode, flaggedIdea, idea, user, vote } from '$lib/schema';
+import {
+	domain,
+	emailVerificationCode,
+	flaggedIdea,
+	idea,
+	password,
+	passwordResetToken,
+	user,
+	vote,
+} from '$lib/schema';
 import { and, desc, eq, not, sql } from 'drizzle-orm';
 import { db } from './db';
 import type { isProhibitedTextWithReasons } from './moderation';
 
 export type User = typeof user.$inferSelect;
+export type NewUser = typeof user.$inferInsert;
+
+export const insertUser = (newUser: NewUser) => {
+	return db.insert(user).values(newUser).returning({ id: user.id });
+};
+
+export const getUserByUsernameWithPassword = (username: string) => {
+	return db.query.user.findFirst({
+		where: (user, { eq }) => eq(user.username, username.toLowerCase()),
+		with: {
+			password: {
+				columns: {
+					hashedPassword: true,
+				},
+			},
+		},
+	});
+};
+
+export const getUserByEmail = (email: string) => {
+	return db.query.user.findFirst({
+		where: (user, { eq }) => eq(user.email, email.toLowerCase()),
+	});
+};
 
 export const updateUser = (userId: string, data: Partial<User>) => {
 	return db
 		.update(user)
 		.set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })
 		.where(eq(user.id, userId));
+};
+
+export const insertPassword = (newPassword: { userId: string; hashedPassword: string }) => {
+	return db.insert(password).values(newPassword);
+};
+
+export const upsertPassword = (values: { userId: string; hashedPassword: string }) => {
+	return db
+		.insert(password)
+		.values({ ...values })
+		.onConflictDoUpdate({
+			target: password.userId,
+			set: { hashedPassword: values.hashedPassword, updatedAt: sql`CURRENT_TIMESTAMP` },
+		});
+};
+
+export const getPassword = (userId: string) => {
+	return db.query.password.findFirst({
+		where: (password, { eq }) => eq(password.userId, userId),
+	});
 };
 
 export const insertEmailVerificationCode = (userId: string) => {
@@ -34,6 +87,23 @@ export const deleteAllEmailVerificationCodesForUser = (userId: string) => {
 
 export const deleteEmailVerificationCode = (code: string) => {
 	return db.delete(emailVerificationCode).where(eq(emailVerificationCode.code, code));
+};
+
+export const insertPasswordResetToken = (userId: string) => {
+	return db.insert(passwordResetToken).values({ userId }).returning({ token: passwordResetToken.token });
+};
+
+export const getPasswordResetTokenWithUser = (token: string) => {
+	return db.query.passwordResetToken.findFirst({
+		where: (passwordResetToken, { eq }) => eq(passwordResetToken.token, token),
+		with: {
+			user: true,
+		},
+	});
+};
+
+export const deletePasswordResetToken = (token: string) => {
+	return db.delete(passwordResetToken).where(eq(passwordResetToken.token, token));
 };
 
 export type Domain = typeof domain.$inferInsert;

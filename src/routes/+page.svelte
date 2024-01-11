@@ -50,7 +50,7 @@
 			{/if}
 			<h3>Vote on the best ideas so far:</h3>
 			<ul>
-				{#each data.ideas ?? [] as idea}
+				{#each data.ideas as idea}
 					{@const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0)}
 					{@const existingVote = data.userId && idea.votes.find((vote) => vote.userId === data.userId)}
 					<li>

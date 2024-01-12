@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			},
 		});
 		const githubUser: GitHubUser = await githubUserResponse.json();
-		const existingUser = await getOauthAccount('github', githubUser.id);
+		const existingUser = await getOauthAccount('github', String(githubUser.id));
 		console.log({ existingUser });
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.user.id, {});

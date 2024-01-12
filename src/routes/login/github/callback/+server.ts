@@ -4,14 +4,15 @@ import { OAuth2RequestError } from 'arctic';
 import { generateId } from 'lucia';
 import type { RequestHandler } from './$types';
 import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
-import { error, redirect } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
 	const code = url.searchParams.get('code');
 	const state = url.searchParams.get('state');
 	const storedState = cookies.get('github_oauth_state') ?? null;
 	if (!code || !state || !storedState || state !== storedState) {
-		return error(400);
+		return new Response(null, {
+			status: 400,
+		});
 	}
 
 	try {
@@ -23,7 +24,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		});
 		const githubUser: GitHubUser = await githubUserResponse.json();
 		const existingUser = await getOauthAccount('github', String(githubUser.id));
-		console.log({ existingUser });
+
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.user.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
@@ -47,17 +48,29 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				...sessionCookie.attributes,
 			});
 		}
-		return redirect(302, '/');
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: '/',
+			},
+		});
 	} catch (e) {
 		console.log({ e });
 		// the specific error message depends on the provider
 		if (e instanceof OAuth2RequestError) {
 			// invalid code
-			return error(400);
+			return new Response(null, {
+				status: 400,
+			});
 		} else if (e instanceof Error && e.message === 'Unverified email') {
-			redirect(302, '/login/?error=unverified-email');
+			return new Response(null, {
+				status: 302,
+				headers: { Location: '/login/?error=unverified-email' },
+			});
 		}
-		return error(500);
+		return new Response(null, {
+			status: 500,
+		});
 	}
 };
 

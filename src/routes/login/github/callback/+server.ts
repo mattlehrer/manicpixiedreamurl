@@ -5,10 +5,12 @@ import { generateId } from 'lucia';
 import type { RequestHandler } from './$types';
 import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
 
+const providerId = 'github';
+
 export const GET: RequestHandler = async ({ url, cookies }) => {
 	const code = url.searchParams.get('code');
 	const state = url.searchParams.get('state');
-	const storedState = cookies.get('github_oauth_state') ?? null;
+	const storedState = cookies.get('oauth_state') ?? null;
 	if (!code || !state || !storedState || state !== storedState) {
 		return new Response(null, {
 			status: 400,
@@ -17,13 +19,13 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 	try {
 		const tokens = await github.validateAuthorizationCode(code);
-		const githubUserResponse = await fetch('https://api.github.com/user', {
+		const oauthUserResponse = await fetch('https://api.github.com/user', {
 			headers: {
 				Authorization: `Bearer ${tokens.accessToken}`,
 			},
 		});
-		const githubUser: GitHubUser = await githubUserResponse.json();
-		const existingUser = await getOauthAccount('github', String(githubUser.id));
+		const oauthUser: GitHubUser = await oauthUserResponse.json();
+		const existingUser = await getOauthAccount(providerId, String(oauthUser.id));
 
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.user.id, {});
@@ -34,14 +36,14 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			});
 		} else {
 			const userId = generateId(15);
-			await insertOauthAccount({
-				providerId: 'github',
-				providerUserId: String(githubUser.id),
+			const newUser = await insertOauthAccount({
+				providerId: providerId,
+				providerUserId: String(oauthUser.id),
 				userId: userId,
-				email: githubUser.email,
-				username: githubUser.login,
+				email: oauthUser.email,
+				username: oauthUser.login,
 			});
-			const session = await lucia.createSession(userId, {});
+			const session = await lucia.createSession(newUser[0].id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',

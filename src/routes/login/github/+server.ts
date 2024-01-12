@@ -8,7 +8,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 	const state = generateState();
 	const url = await github.createAuthorizationURL(state, { scopes: ['user:email'] });
 
-	cookies.set('github_oauth_state', state, {
+	cookies.set('oauth_state', state, {
 		path: '/',
 		secure: !dev,
 		httpOnly: true,

@@ -74,7 +74,10 @@ export const insertOauthAccount = async ({
 	const existingEmail = await getUserByEmail(email);
 	if (existingEmail) {
 		if (existingEmail.hasVerifiedEmail) {
-			return db.insert(oauthAccount).values({ providerId, providerUserId, userId: existingEmail.id });
+			return db
+				.insert(oauthAccount)
+				.values({ providerId, providerUserId, userId: existingEmail.id })
+				.returning({ id: user.id });
 		} else {
 			throw new Error('Unverified email');
 		}
@@ -86,12 +89,12 @@ export const insertOauthAccount = async ({
 			// use a random username
 			username = `${username}-${generateId(5)}`;
 		}
+		await db.transaction(async (tx) => {
+			await tx.insert(user).values({ id: userId, email, username, hasVerifiedEmail: true });
+			await tx.insert(oauthAccount).values({ providerId, providerUserId, userId });
+		});
+		return [{ id: userId }];
 	}
-
-	return db.transaction(async (tx) => {
-		await tx.insert(user).values({ id: userId, email, username, hasVerifiedEmail: true });
-		await tx.insert(oauthAccount).values({ providerId, providerUserId, userId });
-	});
 };
 
 export const insertPassword = (newPassword: { userId: string; hashedPassword: string }) => {

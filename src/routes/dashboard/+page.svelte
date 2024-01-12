@@ -342,6 +342,7 @@
 							// TODO: show error, show success; add toasts
 							// if (result.type === 'success') {
 							$deleteDomainDialogOpen = false;
+							mightBeAbleToAddDomain = true;
 							// }
 						};
 					}}

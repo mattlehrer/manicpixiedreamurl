@@ -4,16 +4,14 @@ import { OAuth2RequestError } from 'arctic';
 import { generateId } from 'lucia';
 import type { RequestHandler } from './$types';
 import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
 	const code = url.searchParams.get('code');
 	const state = url.searchParams.get('state');
 	const storedState = cookies.get('github_oauth_state') ?? null;
 	if (!code || !state || !storedState || state !== storedState) {
-		return new Response(null, {
-			status: 400,
-		});
+		return error(400);
 	}
 
 	try {
@@ -49,26 +47,17 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				...sessionCookie.attributes,
 			});
 		}
-		return new Response(null, {
-			status: 302,
-			headers: {
-				Location: '/',
-			},
-		});
+		return redirect(302, '/');
 	} catch (e) {
 		console.log({ e });
 		// the specific error message depends on the provider
 		if (e instanceof OAuth2RequestError) {
 			// invalid code
-			return new Response(null, {
-				status: 400,
-			});
+			return error(400);
 		} else if (e instanceof Error && e.message === 'Unverified email') {
 			redirect(302, '/login/?error=unverified-email');
 		}
-		return new Response(null, {
-			status: 500,
-		});
+		return error(500);
 	}
 };
 

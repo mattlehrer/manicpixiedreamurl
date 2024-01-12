@@ -17,6 +17,7 @@ export const user = sqliteTable('user', {
 });
 
 export const userRelations = relations(user, ({ many, one }) => ({
+	oauthAccounts: many(oauthAccount),
 	domain: many(domain),
 	ideas: many(idea),
 	flaggedIdeas: many(flaggedIdea),

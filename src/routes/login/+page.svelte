@@ -22,9 +22,9 @@
 
 {#if !data.error && data.error !== 'unverified-email'}
 	<section class="oauth">
-		<a href="/login/github">Sign in with Apple</a>
-		<a href="/login/github">Sign in with Google</a>
-		<a href="/login/github">Sign in with Discord</a>
+		<!-- <a href="/login/github">Sign in with Apple</a> -->
+		<!-- <a href="/login/github">Sign in with Google</a> -->
+		<!-- <a href="/login/github">Sign in with Discord</a> -->
 		<a href="/login/github">Sign in with GitHub</a>
 	</section>
 {/if}

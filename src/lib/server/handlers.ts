@@ -119,7 +119,9 @@ export const insertEmailVerificationCode = (userId: string) => {
 };
 
 export const getEmailVerificationCode = (code: string) => {
-	return db.select().from(emailVerificationCode).where(eq(emailVerificationCode.code, code));
+	return db.query.emailVerificationCode.findFirst({
+		where: (emailVerificationCode, { eq }) => eq(emailVerificationCode.code, code),
+	});
 };
 
 export const getAllEmailVerificationCodesForUser = (userId: string) => {

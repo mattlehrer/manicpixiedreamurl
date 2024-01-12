@@ -3,6 +3,7 @@ import {
 	emailVerificationCode,
 	flaggedIdea,
 	idea,
+	oauthAccount,
 	password,
 	passwordResetToken,
 	user,
@@ -11,6 +12,8 @@ import {
 import { and, desc, eq, not, sql } from 'drizzle-orm';
 import { db } from './db';
 import type { isProhibitedTextWithReasons } from './moderation';
+import type { ProviderId } from './auth';
+import { generateId } from 'lucia';
 
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
@@ -43,6 +46,52 @@ export const updateUser = (userId: string, data: Partial<User>) => {
 		.update(user)
 		.set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })
 		.where(eq(user.id, userId));
+};
+
+export const getOauthAccount = (providerId: ProviderId, providerUserId: string) => {
+	return db.query.oauthAccount.findFirst({
+		where: (oauthAccount, { and, eq }) =>
+			and(eq(oauthAccount.providerId, providerId), eq(oauthAccount.providerUserId, providerUserId)),
+		with: {
+			user: true,
+		},
+	});
+};
+
+export const insertOauthAccount = async ({
+	providerId,
+	providerUserId,
+	userId,
+	email,
+	username,
+}: {
+	providerId: ProviderId;
+	providerUserId: string;
+	userId: string;
+	email: string;
+	username: string;
+}) => {
+	const existingEmail = await getUserByEmail(email);
+	if (existingEmail) {
+		if (existingEmail.hasVerifiedEmail) {
+			return db.insert(oauthAccount).values({ providerId, providerUserId, userId: existingEmail.id });
+		} else {
+			throw new Error('Unverified email');
+		}
+	} else {
+		const existingUsername = await db.query.user.findFirst({
+			where: (user, { eq }) => eq(user.username, username.toLowerCase()),
+		});
+		if (existingUsername) {
+			// use a random username
+			username = `${username}-${generateId(5)}`;
+		}
+	}
+
+	return db.transaction(async (tx) => {
+		await tx.insert(user).values({ id: userId, email, username, hasVerifiedEmail: true });
+		await tx.insert(oauthAccount).values({ providerId, providerUserId, userId });
+	});
 };
 
 export const insertPassword = (newPassword: { userId: string; hashedPassword: string }) => {

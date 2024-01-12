@@ -25,7 +25,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 		redirect(302, redirectTo.href);
 	}
-	return {};
+	const e = url.searchParams.get('error');
+	return {
+		error: e,
+	};
 };
 
 export const actions: Actions = {

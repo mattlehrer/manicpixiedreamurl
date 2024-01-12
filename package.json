@@ -51,6 +51,7 @@
 		"@neoconfetti/svelte": "^2.2.1",
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@sveltejs/adapter-node": "^3.0.0",
+		"arctic": "^0.10.3",
 		"better-sqlite3": "^9.2.2",
 		"drizzle-orm": "^0.29.3",
 		"expiry-map": "^2.0.0",

@@ -17,6 +17,9 @@ dependencies:
   '@sveltejs/adapter-node':
     specifier: ^3.0.0
     version: 3.0.0(@sveltejs/kit@2.3.0)
+  arctic:
+    specifier: ^0.10.3
+    version: 0.10.3
   better-sqlite3:
     specifier: ^9.2.2
     version: 9.2.2
@@ -1410,6 +1413,7 @@ packages:
       '@rollup/plugin-node-resolve': 15.2.3(rollup@4.9.4)
       '@sveltejs/kit': 2.3.0(@sveltejs/vite-plugin-svelte@3.0.1)(svelte@5.0.0-next.30)(vite@5.0.11)
       rollup: 4.9.4
+    dev: false
 
   /@sveltejs/kit@2.3.0(@sveltejs/vite-plugin-svelte@3.0.1)(svelte@5.0.0-next.30)(vite@5.0.11):
     resolution: {integrity: sha512-A6/aQTVFONDDv8nRLINNiXrERq6VeAdHT+/gHPBUSDt4+b6oBKTEF3oiGzNmxspcWDgHzBpypFO7NWtkoUK67g==}
@@ -1794,6 +1798,12 @@ packages:
       normalize-path: 3.0.0
       picomatch: 2.3.1
     dev: true
+
+  /arctic@0.10.3:
+    resolution: {integrity: sha512-xS0GYJsjwSPJSkHfuavzwdGRF+jda98dWeAPgFb5UkXuN7ECYuTDdsgB/a522MWLJvCSczTWMeEfMCQjlyhNew==}
+    dependencies:
+      oslo: 0.24.0
+    dev: false
 
   /argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -3606,6 +3616,13 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
     dev: true
+
+  /oslo@0.24.0:
+    resolution: {integrity: sha512-ALOypmwQXyu7AluDqF/EySx7AjWk85gHKY+3yb2LaZ5vArc2jxxZF6tNwGKQ3Rb968ednCFf3opAOoaetRN9+g==}
+    dependencies:
+      '@node-rs/argon2': 1.7.0
+      '@node-rs/bcrypt': 1.9.0
+    dev: false
 
   /oslo@0.27.1:
     resolution: {integrity: sha512-AYU0LpwZ50wIMD3dr4NX0tQzjwxaejSSV9reiY9jbQfgODt49al3f3tMcijyddyvPknUPArz845vpswWyJTWvA==}

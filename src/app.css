@@ -138,6 +138,10 @@ input[type='submit'] {
 	.dash-reason {
 		max-width: max-content;
 	}
+
+	.oauth {
+		max-width: 40ch;
+	}
 }
 
 .notice {
@@ -159,6 +163,12 @@ input[type='submit'] {
 	background-color: var(--green-0);
 	border-color: var(--green-9);
 	color: var(--green-9);
+}
+
+.notice.error {
+	background-color: var(--red-0);
+	border-color: var(--red-9);
+	color: var(--red-8);
 }
 
 svg.spin {

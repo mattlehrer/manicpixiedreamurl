@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
-import { text, sqliteTable, integer, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { text, sqliteTable, integer, unique, uniqueIndex, primaryKey } from 'drizzle-orm/sqlite-core';
 import { createId } from '@paralleldrive/cuid2';
 import { uid } from 'uid/secure';
 import { TimeSpan, createDate } from 'oslo';
@@ -24,6 +24,29 @@ export const userRelations = relations(user, ({ many, one }) => ({
 	password: one(password, {
 		fields: [user.id],
 		references: [password.userId],
+	}),
+}));
+
+export const oauthAccount = sqliteTable(
+	'oauth_account',
+	{
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
+		providerId: text('provider_id').notNull(),
+		providerUserId: text('provider_user_id').notNull(),
+		createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
+	},
+	(t) => ({
+		pk: primaryKey({ name: 'oauth_account_pk', columns: [t.providerId, t.providerUserId] }),
+	}),
+);
+
+export const oauthAccountRelations = relations(oauthAccount, ({ one }) => ({
+	user: one(user, {
+		fields: [oauthAccount.userId],
+		references: [user.id],
 	}),
 }));
 

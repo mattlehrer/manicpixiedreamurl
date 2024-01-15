@@ -6,6 +6,17 @@
 	export let data: PageData;
 </script>
 
+{#if data.error}
+	<section>
+		<p class="notice error">
+			{#if data.error === 'oauth-unverified-email'}
+				It looks like you have not verified your email address with that provider. Please either verify your email
+				address there or sign up a different way below.
+			{/if}
+		</p>
+	</section>
+{/if}
+
 <h1>Sign up</h1>
 <form method="post" use:enhance>
 	{#if form?.invalidUsername}<p class="error">Your username should be between 3 and 30 characters.</p>{/if}

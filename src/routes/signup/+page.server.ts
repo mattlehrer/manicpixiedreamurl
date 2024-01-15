@@ -53,9 +53,11 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	if (upvote) loginLink.searchParams.append('upvote', upvote);
 	const downvote = url.searchParams.get('downvote');
 	if (downvote) loginLink.searchParams.append('downvote', downvote);
+	const e = url.searchParams.get('error');
 
 	return {
 		loginLink: loginLink.pathname + loginLink.search,
+		error: e,
 	};
 };
 

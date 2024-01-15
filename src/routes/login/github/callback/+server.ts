@@ -25,6 +25,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			},
 		});
 		const oauthUser: GitHubUser = await oauthUserResponse.json();
+
 		const existingUser = await getOauthAccount(providerId, String(oauthUser.id));
 
 		if (existingUser) {
@@ -35,6 +36,27 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				...sessionCookie.attributes,
 			});
 		} else {
+			if (!oauthUser.email) {
+				// if email isn't public, request from github's email endpoint
+				const oauthEmailResponse = await fetch('https://api.github.com/user/emails', {
+					headers: {
+						Authorization: `Bearer ${tokens.accessToken}`,
+					},
+				});
+				const oauthEmails: { email: string; verified: boolean; primary: boolean }[] = await oauthEmailResponse.json();
+				oauthUser.email =
+					oauthEmails.find((email) => email.primary && email.verified)?.email ??
+					oauthEmails.find((email) => email.verified)?.email ??
+					null;
+			}
+
+			if (!oauthUser.email) {
+				return new Response(null, {
+					status: 302,
+					headers: { Location: '/signup/?error=oauth-unverified-email' },
+				});
+			}
+
 			const userId = generateId(15);
 			const newUser = await insertOauthAccount({
 				providerId: providerId,
@@ -79,5 +101,5 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 interface GitHubUser {
 	id: string;
 	login: string;
-	email: string;
+	email: string | null;
 }

@@ -41,6 +41,12 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				...sessionCookie.attributes,
 			});
 		} else {
+			if (!oauthUser.verified) {
+				return new Response(null, {
+					status: 302,
+					headers: { Location: '/signup/?error=oauth-unverified-email' },
+				});
+			}
 			const userId = generateId(15);
 			const newUser = await insertOauthAccount({
 				providerId,
@@ -48,7 +54,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				userId: userId,
 				email: oauthUser.email,
 				username: oauthUser.username,
-				isEmailVerified: oauthUser.verified,
 			});
 			console.log({ newUser });
 			if (!newUser || !newUser[0].id) {

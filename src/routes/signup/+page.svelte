@@ -18,6 +18,16 @@
 {/if}
 
 <h1>Sign up</h1>
+
+<section class="oauth">
+	<a href="/login/google">Sign up with Google</a>
+	<a href="/login/discord">Sign up with Discord</a>
+	<a href="/login/github">Sign up with GitHub</a>
+</section>
+
+<hr />
+
+<p>Or sign up with a password</p>
 <form method="post" use:enhance>
 	{#if form?.invalidUsername}<p class="error">Your username should be between 3 and 30 characters.</p>{/if}
 	{#if form?.invalidEmail}<p class="error">Enter a valid email.</p>{/if}
@@ -35,3 +45,14 @@
 	<button type="submit">Sign up</button>
 </form>
 <a href={data.loginLink}>Already have an account? Sign in</a>
+
+<style lang="postcss">
+	a {
+		display: block;
+		margin-block-start: var(--size-3);
+	}
+
+	form {
+		margin-block-end: var(--size-6);
+	}
+</style>

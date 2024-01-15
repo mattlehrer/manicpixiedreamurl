@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { aRecord } from '$lib/config';
+	import { aRecord, dashboardSites } from '$lib/config';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 </script>
+
+<svelte:head>
+	<link href={`${dashboardSites[0]}/domain-instructions`} rel="canonical" />
+</svelte:head>
 
 <h1>How to Configure Your Domain's DNS</h1>
 

@@ -25,6 +25,12 @@
 	});
 </script>
 
+<svelte:head>
+	{#if !data.domain}
+		<link href={dashboardSites[0]} rel="canonical" />
+	{/if}
+</svelte:head>
+
 {#if data.origin && dashboardSites.includes(data.origin)}
 	<Landing loggedIn={data.loggedIn} discoveryDomains={data.discoveryDomains} />
 {:else if data.domain !== undefined}

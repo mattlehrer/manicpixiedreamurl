@@ -74,6 +74,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 		return {
 			host: url.host.toLowerCase().replace(/^www\./, ''),
 			pathname: url.pathname,
+			origin: url.origin,
 			domain: domainData,
 			ideas: ideaData,
 			newIdea,

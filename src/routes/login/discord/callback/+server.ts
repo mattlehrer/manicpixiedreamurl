@@ -31,8 +31,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 		const oauthUser: DiscordUser = await oauthUserResponse.json();
 
-		console.log({ oauthUser });
-
 		const existingUser = await getOauthAccount(providerId, String(oauthUser.id));
 
 		if (existingUser) {
@@ -50,6 +48,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				userId: userId,
 				email: oauthUser.email,
 				username: oauthUser.username,
+				isEmailVerified: oauthUser.verified,
 			});
 			console.log({ newUser });
 			if (!newUser || !newUser[0].id) {
@@ -94,4 +93,5 @@ interface DiscordUser {
 	id: string;
 	username: string;
 	email: string;
+	verified: boolean;
 }

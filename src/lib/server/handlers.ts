@@ -64,12 +64,14 @@ export const insertOauthAccount = async ({
 	userId,
 	email,
 	username,
+	isEmailVerified = true,
 }: {
 	providerId: ProviderId;
 	providerUserId: string;
 	userId: string;
 	email: string;
 	username: string;
+	isEmailVerified: boolean;
 }) => {
 	const existingEmail = await getUserByEmail(email);
 	if (existingEmail) {
@@ -90,7 +92,7 @@ export const insertOauthAccount = async ({
 			username = `${username}-${generateId(5)}`;
 		}
 		await db.transaction(async (tx) => {
-			await tx.insert(user).values({ id: userId, email, username, hasVerifiedEmail: true });
+			await tx.insert(user).values({ id: userId, email, username, hasVerifiedEmail: isEmailVerified });
 			await tx.insert(oauthAccount).values({ providerId, providerUserId, userId });
 		});
 		return [{ id: userId }];

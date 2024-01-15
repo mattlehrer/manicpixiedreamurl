@@ -44,24 +44,6 @@
 <a href="/reset-password">Forgot your password? Reset it</a>
 
 <style lang="postcss">
-	.oauth {
-		padding-block: var(--size-6);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--size-3);
-	}
-
-	.oauth a {
-		text-align: center;
-		width: 100%;
-		display: inline-block;
-		background-color: var(--surface-2);
-		padding: var(--size-2) var(--size-4);
-		border-radius: var(--radius-2);
-		box-shadow: var(--shadow-2);
-	}
-
 	a {
 		display: block;
 		margin-block-start: var(--size-3);

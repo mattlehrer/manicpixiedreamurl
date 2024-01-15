@@ -71,7 +71,7 @@ export const insertOauthAccount = async ({
 	userId: string;
 	email: string;
 	username: string;
-	isEmailVerified: boolean;
+	isEmailVerified?: boolean;
 }) => {
 	const existingEmail = await getUserByEmail(email);
 	if (existingEmail) {

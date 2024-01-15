@@ -77,7 +77,7 @@ export const insertOauthAccount = async ({
 			return db
 				.insert(oauthAccount)
 				.values({ providerId, providerUserId, userId: existingEmail.id })
-				.returning({ id: user.id });
+				.returning({ id: oauthAccount.userId });
 		} else {
 			throw new Error('Unverified email');
 		}

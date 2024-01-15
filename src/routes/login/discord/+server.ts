@@ -7,6 +7,7 @@ import { dev } from '$app/environment';
 export const GET: RequestHandler = async ({ cookies }) => {
 	const state = generateState();
 	const url = await discord.createAuthorizationURL(state, { scopes: ['identify', 'email'] });
+	url.searchParams.append('prompt', 'none');
 
 	cookies.set('oauth_state', state, {
 		path: '/',

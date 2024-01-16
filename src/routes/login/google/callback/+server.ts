@@ -49,7 +49,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				userId: userId,
 				email: oauthUser.email,
 				username: oauthUser.name.replaceAll(' ', '_'),
-				isEmailVerified: oauthUser.email_verified,
 			});
 			console.log({ newUser });
 			if (!newUser || !newUser[0].id) {

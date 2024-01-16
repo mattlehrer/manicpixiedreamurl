@@ -23,7 +23,8 @@
 		build.
 	</p>
 	<p class="cta">
-		<a href="/signup">Sign up</a> to get started. Your first domain is free.
+		<a href="/signup">Sign up</a> to start submitting and voting on ideas. Collect ideas on your first three domains for
+		free.
 	</p>
 {/if}
 

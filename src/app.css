@@ -194,3 +194,15 @@ svg.spin {
 	opacity: 0.85;
 	animation: var(--animation-spin);
 }
+
+.og svg {
+	height: 12rem;
+	width: auto;
+	margin-block-start: 0.75rem;
+	color: var(--gray-1);
+}
+
+#branding svg.logo {
+	height: 7rem;
+	width: auto;
+}

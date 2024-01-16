@@ -11,7 +11,7 @@
 		<div class="network-og">
 			<div class="row">
 				<div class="site">
-					<h2>{$site}</h2>
+					<h2>{$site}{$site}{$site}</h2>
 					<p>because {$reason}</p>
 				</div>
 				<p>What would you build?</p>
@@ -39,11 +39,24 @@
 </article>
 
 <style lang="postcss">
+	@font-face {
+		font-family: InterVariable;
+		font-style: normal;
+		font-weight: 100 900;
+		font-display: swap;
+		src: url('/fonts/InterVariable.woff2?v=4.0') format('woff2');
+	}
+
 	article {
+		font-family: InterVariable;
+		font-feature-settings:
+			'liga' 1,
+			'calt' 1; /* fix for Chrome */
 		width: 1200px;
 		height: 630px;
 		background: var(--gradient-8);
 		color: var(--gray-1);
+		overflow:;
 	}
 
 	p {
@@ -67,7 +80,7 @@
 	}
 
 	h2 {
-		font-size: 2.79rem;
+		font-size: 2.7rem;
 		font-weight: 700;
 		text-wrap: unset;
 		max-inline-size: none;
@@ -104,7 +117,7 @@
 	}
 
 	.network-og h3 {
-		font-size: 2.15rem;
+		font-size: 2.2rem;
 	}
 
 	.network-og .site > * {
@@ -115,6 +128,7 @@
 		display: flex;
 		justify-content: space-between;
 		gap: 2rem;
+		position: relative;
 	}
 
 	.network-og .row > p {
@@ -129,6 +143,8 @@
 		background: var(--gradient-4);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
+		position: absolute;
+		right: 0;
 	}
 
 	.network-og .site > p {

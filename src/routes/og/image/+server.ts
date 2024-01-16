@@ -17,6 +17,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	// if (topIdea) imageUrl.searchParams.set('topIdea', topIdea);
 
 	await page.goto(imageUrl.href);
+	await page.waitForFunction(() => document.fonts.check('12px InterVariable'));
 
 	const image = await page.locator('article.og').screenshot();
 

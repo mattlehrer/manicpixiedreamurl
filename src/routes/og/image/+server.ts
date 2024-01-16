@@ -27,6 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	return new Response(image, {
 		headers: {
 			'Content-Type': 'image/png',
+			'Cache-Control': 'public, max-age=86400, immutable',
 		},
 	});
 };

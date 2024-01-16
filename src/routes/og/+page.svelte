@@ -11,7 +11,7 @@
 		<div class="network-og">
 			<div class="row">
 				<div class="site">
-					<h2>{$site}{$site}{$site}</h2>
+					<h2>{$site}</h2>
 					<p>because {$reason}</p>
 				</div>
 				<p>What would you build?</p>

@@ -54,7 +54,7 @@
 		display: flex;
 		align-items: start;
 		justify-content: center;
-		gap: 3rem;
+		gap: 2rem;
 		padding-block: 8rem;
 	}
 
@@ -63,11 +63,11 @@
 	}
 
 	.mpdu-og h1 {
-		font-size: 4.75rem;
+		font-size: 4.5rem;
 	}
 
 	h2 {
-		font-size: 2.94rem;
+		font-size: 2.79rem;
 		font-weight: 700;
 		text-wrap: unset;
 		max-inline-size: none;

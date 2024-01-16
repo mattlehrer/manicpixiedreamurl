@@ -196,7 +196,7 @@ svg.spin {
 }
 
 .og svg {
-	height: 12rem;
+	height: 10rem;
 	width: auto;
 	margin-block-start: 0.75rem;
 	color: var(--gray-1);

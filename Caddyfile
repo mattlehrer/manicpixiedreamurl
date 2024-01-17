@@ -1,0 +1,48 @@
+# /etc/caddy/Caddyfile
+{
+	on_demand_tls {
+		ask http://localhost:3000/api/caddy/check
+	}
+	order rate_limit before basicauth
+}
+
+www.manicpixiedreamurl.com {
+	redir https://manicpixiedreamurl.com{uri}
+}
+
+datasette.manicpixiedreamurl.com {
+	rate_limit {
+		zone static {
+			key static
+			events 10
+			window 30s
+		}
+	}
+	basicauth * {
+		matt {$CADDY_HASHED_PWD}
+	}
+	reverse_proxy localhost:8000
+}
+
+https:// {
+	rate_limit {
+		zone dynamic {
+			key {http.request.remote.host}
+			events 20
+			window 1m
+		}
+	}
+
+	@plausible path /js/script.js /api/event
+	handle @plausible {
+		rewrite /js/script.js /js/script.pageview-props.js
+		reverse_proxy https://plausible.io {
+			header_up Host {http.reverse_proxy.upstream.hostport}
+		}
+	}
+
+	tls {
+		on_demand
+	}
+	reverse_proxy localhost:3000
+}

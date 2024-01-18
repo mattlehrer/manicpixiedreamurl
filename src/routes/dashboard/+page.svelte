@@ -4,7 +4,6 @@
 	import DNSVerification from '$lib/components/DNSVerification.svelte';
 	import { enhance } from '$app/forms';
 	import DomainReason from '$lib/components/DomainReason.svelte';
-	import LoadingSpinner from '$lib/assets/LoadingSpinner.svelte';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { dev } from '$app/environment';
 	import { aRecord } from '$lib/config';
@@ -17,31 +16,20 @@
 	let domain: string = $state(form ? String(form?.domain) : '');
 
 	let removeDomain: { id: string; name: string } | null = $state(null);
+	let editDomain: { id: string; name: string; reason: string } | null = $state(null);
+
 	$effect(() => {
-		if (!$deleteDomainDialogOpen) {
+		if (!$openEditDialog) {
+			removeDomain = null;
+		}
+	});
+	$effect(() => {
+		if (!$openDeleteDomainDialog) {
 			removeDomain = null;
 		}
 	});
 
 	let mightBeAbleToAddDomain = $state(true);
-
-	let updating: Record<string, 'updating' | 'updated' | 'error'> = $state({});
-
-	async function updateReason(domainId: string, domainReason: string) {
-		updating[domainId] = 'updating';
-		const res = await fetch(`/api/domain`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ domainId, domainReason }),
-		});
-		if (res.ok) {
-			updating[domainId] = 'updated';
-		} else {
-			updating[domainId] = 'error';
-		}
-	}
 
 	$effect(() => {
 		if (data.domains.length >= data.maxDomains) {
@@ -60,8 +48,32 @@
 	});
 
 	const {
-		elements: { trigger, overlay, content, title, description, close, portalled },
-		states: { open: deleteDomainDialogOpen },
+		elements: {
+			trigger: triggerEditDialog,
+			overlay: overlayEditDialog,
+			content: contentEditDialog,
+			title: titleEditDialog,
+			description: descriptionEditDialog,
+			close: closeEditDialog,
+			portalled: portalledEditDialog,
+		},
+		states: { open: openEditDialog },
+	} = createDialog({
+		role: 'alertdialog',
+		forceVisible: true,
+	});
+
+	const {
+		elements: {
+			trigger: triggerDeleteDialog,
+			overlay: overlayDeleteDialog,
+			content: contentDeleteDialogDeleteDialog,
+			title: titleDeleteDialog,
+			description: descriptionDeleteDialog,
+			close: closeDeleteDialog,
+			portalled: portalledDeleteDialog,
+		},
+		states: { open: openDeleteDomainDialog },
 	} = createDialog({
 		role: 'alertdialog',
 		forceVisible: true,
@@ -231,7 +243,7 @@
 				<th>Domain</th>
 				<th class="dns-column">DNS</th>
 				<th class="wider">Reason</th>
-				<th></th>
+				<th>Edit</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -245,65 +257,26 @@
 					</td>
 
 					<td class="wider">
-						<textarea
-							name="{domain.name}-reason"
-							rows="3"
-							bind:value={domain.reason}
-							onchange={() => updateReason(domain.id, domain.reason)}
-						/>
-						{#if updating[domain.id] === 'updating'}
-							<LoadingSpinner />
-							<span class="sr-only">Updating...</span>
-						{:else if updating[domain.id] === 'error'}
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								style="color: var(--red-8);"
-								><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg
-							>
-							<span class="sr-only">Error</span>
-						{:else if updating[domain.id] === 'updated'}
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								style="color: var(--green-7);"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg
-							>
-							<span class="sr-only">Updated</span>
-						{/if}
+						{domain.reason}
 					</td>
-					<!-- TODO: make this a small button and add an "are you sure? this action cannot be undone." dialog to confirm-->
 					<td>
 						<button
-							use:melt={$trigger}
-							class="remove-btn"
+							use:melt={$triggerEditDialog}
+							class="edit-btn"
 							onclick={() => {
-								removeDomain = domain;
+								editDomain = domain;
 							}}
 						>
 							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
 								fill="none"
 								stroke="currentColor"
-								stroke-width="2"
 								stroke-linecap="round"
-								stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+								stroke-linejoin="round"
+								stroke-width="2"
+								viewBox="0 0 24 24"
+								><path d="M20 7h-9m3 10H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" /></svg
 							>
-							<span class="sr-only">Remove</span>
+							<span class="sr-only">Edit {domain.name}</span>
 						</button>
 					</td>
 				</tr>
@@ -312,9 +285,84 @@
 	</table>
 {/if}
 
-<div class="" use:melt={$portalled}>
-	{#if $deleteDomainDialogOpen}
-		<div use:melt={$overlay} class="dialog-bg" />
+<div class="" use:melt={$portalledEditDialog}>
+	{#if $openEditDialog}
+		<div use:melt={$overlayEditDialog} class="dialog-bg" />
+		<div
+			class="dialog"
+			transition:fly={{
+				duration: 150,
+				y: 8,
+			}}
+			use:melt={$contentEditDialog}
+		>
+			{#if editDomain}
+				<h2 use:melt={$titleEditDialog} class="dialog-title">
+					Edit {editDomain.name}
+				</h2>
+				<p use:melt={$descriptionEditDialog} class="dialog-description">
+					You can edit the reason you bought this domain or delete it here.
+				</p>
+				<form
+					method="post"
+					action="?/updateDomain"
+					use:enhance={() => {
+						return async ({ update }) => {
+							await update();
+							// TODO: show error, show success; add toasts
+							// if (result.type === 'success') {
+							$openEditDialog = false;
+							// }
+						};
+					}}
+				>
+					<label for="edit-reason"> Reason </label>
+					<textarea id="edit-reason" name="reason" rows="3" value={editDomain.reason} />
+					<input type="hidden" name="domainId" value={editDomain.id} />
+
+					<label for="remove-domain">Want to delete this domain?</label>
+					<button
+						use:melt={$triggerDeleteDialog}
+						id="remove-domain"
+						class="remove-btn"
+						onclick={() => {
+							removeDomain = editDomain;
+						}}
+					>
+						Remove {editDomain.name}
+					</button>
+
+					<div class="dialog-actions">
+						<button use:melt={$closeEditDialog} class="dialog-secondary"> Cancel </button>
+						<input type="hidden" name="domainId" value={editDomain?.id} />
+						<input
+							type="submit"
+							class="dialog-primary"
+							value="Save changes for {editDomain?.name}"
+							disabled={!editDomain}
+						/>
+					</div>
+				</form>
+			{/if}
+
+			<button use:melt={$closeEditDialog} aria-label="Close" class="dialog-close">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+				>
+			</button>
+		</div>
+	{/if}
+</div>
+
+<div class="" use:melt={$portalledDeleteDialog}>
+	{#if $openDeleteDomainDialog}
+		<div use:melt={$overlayDeleteDialog} class="dialog-bg" />
 		<div
 			class="dialog"
 			transition:fly={{
@@ -322,12 +370,12 @@
 				y: 8,
 				// start: 0.96,
 			}}
-			use:melt={$content}
+			use:melt={$contentDeleteDialogDeleteDialog}
 		>
-			<h2 use:melt={$title} class="dialog-title">
+			<h2 use:melt={$titleDeleteDialog} class="dialog-title">
 				Are you sure you want to remove {removeDomain?.name} from your account?
 			</h2>
-			<p use:melt={$description} class="dialog-description">
+			<p use:melt={$descriptionDeleteDialog} class="dialog-description">
 				<strong>This action cannot be undone.</strong> This will permanently delete the domain and all associated ideas and
 				votes from our servers.
 			</p>
@@ -341,24 +389,25 @@
 							await update();
 							// TODO: show error, show success; add toasts
 							// if (result.type === 'success') {
-							$deleteDomainDialogOpen = false;
+							$openDeleteDomainDialog = false;
+							$openEditDialog = false;
 							mightBeAbleToAddDomain = true;
 							// }
 						};
 					}}
 				>
-					<button use:melt={$close} class="dialog-secondary"> Cancel </button>
+					<button use:melt={$closeDeleteDialog} class="dialog-secondary"> Cancel </button>
 					<input type="hidden" name="domainId" value={removeDomain?.id} />
 					<input
 						type="submit"
-						class="dialog-primary"
+						class="delete-dialog-primary"
 						value="Permanently delete {removeDomain?.name}"
 						disabled={!removeDomain}
 					/>
 				</form>
 			</div>
 
-			<button use:melt={$close} aria-label="Close" class="dialog-close">
+			<button use:melt={$closeDeleteDialog} aria-label="Close" class="dialog-close">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
@@ -397,9 +446,15 @@
 		display: block;
 		margin-block-start: var(--size-2);
 	}
+
+	label[for='remove-domain'] {
+		margin-block-start: var(--size-4);
+	}
+
 	table {
 		margin-block-start: var(--size-6);
 		border-radius: 0;
+		width: 100%;
 		max-width: 100%;
 		border-collapse: collapse;
 		border: 0;
@@ -417,10 +472,6 @@
 		padding-inline: var(--size-1);
 	}
 
-	tr td:last-child {
-		padding-inline: var(--size-1);
-	}
-
 	.dns-column {
 		width: 3rem;
 	}
@@ -428,14 +479,10 @@
 	.wider {
 		min-width: 100%;
 		text-align: left;
-		padding-inline: var(--size-1);
+		/* padding-inline: var(--size-1); */
 		display: flex;
 		align-items: center;
 		position: relative;
-	}
-
-	.wider textarea {
-		/* margin-inline-start: calc(-1 * var(--size-2)); */
 	}
 
 	.dash-reason {
@@ -447,15 +494,7 @@
 		margin-inline-end: calc(-1 * var(--size-4));
 	}
 
-	td textarea ~ svg:not(.spin) {
-		position: absolute;
-		right: var(--size-2);
-		animation:
-			1s var(--animation-fade-in) forwards,
-			6s var(--animation-fade-out) forwards;
-	}
-
-	.remove-btn {
+	.edit-btn {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -463,7 +502,6 @@
 		padding: var(--size-1) var(--size-2);
 		background-color: var(--surface-1);
 		font-weight: var(--font-weight-2);
-		color: var(--red-6);
 		transition: var(--transition-shadow);
 		width: var(--size-3);
 		height: var(--size-3);
@@ -471,15 +509,29 @@
 		background-color: inherit;
 		border: none;
 		box-shadow: none;
+		outline-offset: 3px;
 	}
 
-	.remove-btn:hover {
+	.edit-btn {
+		color: var(--text-2);
+		vertical-align: middle;
+	}
+
+	.remove-btn {
+		width: max-content;
+		font-size: var(--font-size-1);
+		font-weight: var(--font-weight-3);
+		color: var(--red-5);
+		padding: var(--size-1) var(--size-3);
+	}
+
+	.edit-btn:hover {
 		--_highlight-size: var(--size-1);
 		opacity: 0.75;
+		animation: var(--animation-scale-up) 0.2s forwards;
 	}
 
 	.dialog-bg {
-		/* fixed inset-0 z-50 bg-black/50 */
 		position: fixed;
 		inset: 0;
 		z-index: 50;
@@ -524,9 +576,10 @@
 	.dialog-actions {
 		display: flex;
 		justify-content: flex-end;
-		gap: 1rem;
+		align-items: center;
+		gap: var(--size-3);
 
-		margin-top: 1.5rem;
+		margin-top: var(--size-5);
 	}
 
 	.dialog-actions form {
@@ -558,15 +611,25 @@
 	}
 
 	.dialog-actions button.dialog-secondary {
-		background-color: rgb(var(--color-zinc-100) / 1);
+		background-color: rgb(var(--gray-2) / 1);
 
 		color: var(--blue-6);
 	}
 
-	.dialog-actions input[type='submit'].dialog-primary {
+	.dialog-actions input[type='submit'] {
+		margin-block-start: 0;
+	}
+
+	.dialog-actions input[type='submit'].delete-dialog-primary {
 		background-color: hsl(var(--red-1-hsl) / 0.5);
 
 		color: hsl(var(--red-9-hsl) / 1);
+	}
+
+	.dialog-actions input[type='submit'].dialog-primary {
+		background-color: var(--blue-0);
+
+		color: var(--blue-8);
 	}
 
 	.dialog-close {

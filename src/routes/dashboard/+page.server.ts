@@ -1,7 +1,7 @@
 import { ParseResultType, parseDomain } from 'parse-domain';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { deleteDomain, getDomainsForUser, insertDomain } from '$lib/server/handlers';
+import { deleteDomain, getDomainsForUser, insertDomain, updateDomain } from '$lib/server/handlers';
 import { dev } from '$app/environment';
 import { sendVerificationEmail } from '$lib/server/email';
 import { lucia } from '$lib/server/lucia';
@@ -55,6 +55,29 @@ export const actions: Actions = {
 			});
 
 			return { inserted: true };
+		} catch (error) {
+			console.error(error);
+			return fail(500, { dbError: true });
+		}
+	},
+	updateDomain: async ({ locals, request }) => {
+		if (!locals.session || !locals.user) return fail(401);
+
+		const data = await request.formData();
+		const domainId = data.get('domainId');
+		const reason = data.get('reason');
+
+		if (!domainId || typeof domainId !== 'string') return fail(400, { domainId, invalid: true });
+		if (!reason || typeof reason !== 'string') return fail(400, { reason, invalidReason: true });
+
+		try {
+			const updated = await updateDomain({
+				domainId,
+				ownerId: locals.user.id,
+				data: { reason },
+			});
+
+			return { updated };
 		} catch (error) {
 			console.error(error);
 			return fail(500, { dbError: true });

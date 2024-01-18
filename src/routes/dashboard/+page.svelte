@@ -335,12 +335,7 @@
 					<div class="dialog-actions">
 						<button use:melt={$closeEditDialog} class="dialog-secondary"> Cancel </button>
 						<input type="hidden" name="domainId" value={editDomain?.id} />
-						<input
-							type="submit"
-							class="dialog-primary"
-							value="Save changes for {editDomain?.name}"
-							disabled={!editDomain}
-						/>
+						<input type="submit" class="dialog-primary" value="Save" disabled={!editDomain} />
 					</div>
 				</form>
 			{/if}
@@ -579,7 +574,7 @@
 		align-items: center;
 		gap: var(--size-3);
 
-		margin-top: var(--size-5);
+		margin-top: var(--size-6);
 	}
 
 	.dialog-actions form {
@@ -608,6 +603,7 @@
 
 		font-weight: var(--font-weight-4);
 		line-height: 1;
+		--_ink-shadow: 0;
 	}
 
 	.dialog-actions button.dialog-secondary {
@@ -621,14 +617,14 @@
 	}
 
 	.dialog-actions input[type='submit'].delete-dialog-primary {
-		background-color: hsl(var(--red-1-hsl) / 0.5);
-
-		color: hsl(var(--red-9-hsl) / 1);
+		text-wrap: wrap;
+		height: auto;
+		background-color: var(--red-0);
+		color: var(--red-9);
 	}
 
 	.dialog-actions input[type='submit'].dialog-primary {
 		background-color: var(--blue-0);
-
 		color: var(--blue-8);
 	}
 

@@ -68,7 +68,7 @@ export const actions: Actions = {
 			return fail(500, { dbError: true });
 		}
 	},
-	updateDomain: async ({ locals, request }) => {
+	updateReason: async ({ locals, request }) => {
 		if (!locals.session || !locals.user) return fail(401);
 
 		const data = await request.formData();
@@ -83,6 +83,12 @@ export const actions: Actions = {
 				domainId,
 				ownerId: locals.user.id,
 				data: { reason },
+			});
+
+			await insertIdea({
+				ownerId: locals.user.id,
+				domainId,
+				text: reason,
 			});
 
 			return { updated };

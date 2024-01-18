@@ -301,11 +301,12 @@
 					Edit {editDomain.name}
 				</h2>
 				<p use:melt={$descriptionEditDialog} class="dialog-description">
-					You can edit the reason you bought this domain or delete it here.
+					You can edit the reason you bought this domain or delete it here. Editing the reason will create a new idea
+					that can be voted on for your domain.
 				</p>
 				<form
 					method="post"
-					action="?/updateDomain"
+					action="?/updateReason"
 					use:enhance={() => {
 						return async ({ update }) => {
 							await update();

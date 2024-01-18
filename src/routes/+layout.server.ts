@@ -61,6 +61,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 
 		const ideaData = (await getIdeasWithVotesForDomainId(domainData.id)).map((idea) => ({
 			...idea,
+			isDomainOwners: idea.ownerId === domainData.ownerId,
 			votes: idea.votes.map((vote) => ({
 				...vote,
 				userId: vote.userId === userId ? userId : undefined,

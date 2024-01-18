@@ -75,6 +75,9 @@
 						</form>
 						<span>
 							{idea.text}
+							{#if idea.isDomainOwners}
+								<sup title="Submitted by the domain owner">OP</sup>
+							{/if}
 						</span>
 					</li>
 				{:else}
@@ -231,5 +234,10 @@
 
 	p.error {
 		padding-block-end: var(--size-fluid-1);
+	}
+
+	sup {
+		margin-inline-start: 0.25em;
+		color: var(--pink-6);
 	}
 </style>

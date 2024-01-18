@@ -197,6 +197,7 @@ export const getDomainByName = async (input: string) => {
 			id: true,
 			name: true,
 			reason: true,
+			ownerId: true,
 			isActive: true,
 		},
 	});
@@ -281,6 +282,7 @@ export const getIdeasWithVotesForDomainId = async (domainId: string) => {
 		columns: {
 			id: true,
 			text: true,
+			ownerId: true,
 		},
 		with: {
 			votes: true,

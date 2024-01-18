@@ -163,7 +163,7 @@ export const deletePasswordResetToken = (token: string) => {
 export type Domain = typeof domain.$inferInsert;
 
 export const insertDomain = (newDomain: Domain) => {
-	return db.insert(domain).values(newDomain);
+	return db.insert(domain).values(newDomain).returning({ id: domain.id });
 };
 
 export const updateDomain = ({

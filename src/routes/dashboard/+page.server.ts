@@ -1,7 +1,7 @@
 import { ParseResultType, parseDomain } from 'parse-domain';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { deleteDomain, getDomainsForUser, insertDomain, updateDomain } from '$lib/server/handlers';
+import { deleteDomain, getDomainsForUser, insertDomain, insertIdea, updateDomain } from '$lib/server/handlers';
 import { dev } from '$app/environment';
 import { sendVerificationEmail } from '$lib/server/email';
 import { lucia } from '$lib/server/lucia';
@@ -47,11 +47,19 @@ export const actions: Actions = {
 			return fail(400, { domain, subdomain: true });
 
 		try {
-			await insertDomain({
+			const newDomain = await insertDomain({
 				ownerId: locals.user.id,
 				name: domain,
 				reason,
 				isActive: true,
+			});
+
+			if (!newDomain) return fail(500, { dbError: true });
+
+			await insertIdea({
+				ownerId: locals.user.id,
+				domainId: newDomain[0].id,
+				text: reason,
 			});
 
 			return { inserted: true };

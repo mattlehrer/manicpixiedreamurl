@@ -14,7 +14,7 @@ datasette.manicpixiedreamurl.com {
 	rate_limit {
 		zone static {
 			key static
-			events 10
+			events 25
 			window 30s
 		}
 	}
@@ -28,7 +28,7 @@ https:// {
 	rate_limit {
 		zone dynamic {
 			key {http.request.remote.host}
-			events 20
+			events 50
 			window 1m
 		}
 	}

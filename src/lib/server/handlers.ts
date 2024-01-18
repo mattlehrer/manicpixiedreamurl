@@ -166,11 +166,19 @@ export const insertDomain = (newDomain: Domain) => {
 	return db.insert(domain).values(newDomain);
 };
 
-export const updateDomain = (domainId: string, data: Partial<Domain>) => {
+export const updateDomain = ({
+	domainId,
+	ownerId,
+	data,
+}: {
+	domainId: string;
+	ownerId: string;
+	data: Partial<Domain>;
+}) => {
 	return db
 		.update(domain)
 		.set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })
-		.where(eq(domain.id, domainId));
+		.where(and(eq(domain.id, domainId), eq(domain.ownerId, ownerId)));
 };
 
 export const deleteDomain = (domainId: (typeof domain.$inferSelect)['id'], ownerId: User['id']) => {

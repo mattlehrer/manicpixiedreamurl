@@ -29,7 +29,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		} else {
 			updateData.bareDNSisVerified = true;
 		}
-		await updateDomain(id, updateData);
+		await updateDomain({ domainId: id, ownerId: locals.session.userId, data: updateData });
 	}
 
 	return json(output);

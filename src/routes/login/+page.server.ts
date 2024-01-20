@@ -56,8 +56,7 @@ export const actions: Actions = {
 
 		if (!existingUser.password) {
 			return fail(500, {
-				message:
-					'You created your account before we changed authentication techniques. Please request a password reset email.',
+				message: `You don't have a password and probably signed up using a social login. You can request a password reset email if you want to set a password.`,
 			});
 		}
 

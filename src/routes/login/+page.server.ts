@@ -11,6 +11,7 @@ import {
 	insertUpVote,
 } from '$lib/server/handlers';
 import { dev } from '$app/environment';
+import { analytics } from '$lib/server/analytics';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (locals.user) {
@@ -72,6 +73,14 @@ export const actions: Actions = {
 		cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '/',
 			...sessionCookie.attributes,
+		});
+
+		analytics.identify({
+			userId: existingUser.id,
+			traits: {
+				username: existingUser.username,
+				email: existingUser.email,
+			},
 		});
 
 		const redirectTo = new URL('/check-session', dashboardSites[0]);

@@ -12,6 +12,7 @@ import type { Actions } from './$types';
 import { dashboardSites } from '$lib/config';
 import { sendVerificationEmail } from '$lib/server/email';
 import { isProhibitedTextWithReasons } from '$lib/server/moderation';
+import { analytics } from '$lib/server/analytics';
 
 export const actions: Actions = {
 	addSuggestion: async ({ url, locals, request }) => {
@@ -63,9 +64,17 @@ export const actions: Actions = {
 		}
 
 		const inserted = await insertIdea({
-			ownerId: locals.session.userId,
+			ownerId: locals.user.id,
 			domainId,
 			text: newIdea,
+		});
+
+		analytics.track({
+			userId: locals.user.id,
+			event: 'Added Idea',
+			properties: {
+				domainId: domainId,
+			},
 		});
 
 		return { inserted };
@@ -92,6 +101,15 @@ export const actions: Actions = {
 		const inserted = await insertDownVote({
 			userId: locals.user.id,
 			ideaId,
+		});
+
+		analytics.track({
+			userId: locals.user.id,
+			event: 'Downvoted Idea',
+			properties: {
+				ideaId,
+				domain: url.host,
+			},
 		});
 
 		return { inserted };
@@ -121,6 +139,15 @@ export const actions: Actions = {
 			ideaId,
 		});
 
+		analytics.track({
+			userId: locals.user.id,
+			event: 'Upvoted Idea',
+			properties: {
+				ideaId,
+				domain: url.host,
+			},
+		});
+
 		return { inserted };
 	},
 	unvote: async ({ url, locals, request }) => {
@@ -141,6 +168,15 @@ export const actions: Actions = {
 			ideaId,
 		});
 
+		analytics.track({
+			userId: locals.user.id,
+			event: 'Removed Vote on Idea',
+			properties: {
+				ideaId,
+				domain: url.host,
+			},
+		});
+
 		return { inserted };
 	},
 	resendVerification: async ({ locals }) => {
@@ -153,6 +189,11 @@ export const actions: Actions = {
 			error = e;
 		});
 		if (error) return fail(500, { verificationError: true });
+
+		analytics.track({
+			userId: locals.user.id,
+			event: 'Requested Email Verification',
+		});
 
 		return { sent: true };
 	},

@@ -16,6 +16,7 @@ import {
 import { dev } from '$app/environment';
 import { Argon2id } from 'oslo/password';
 import { generateId } from 'lucia';
+import { analytics } from '$lib/server/analytics';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (locals.user) {
@@ -105,6 +106,14 @@ export const actions: Actions = {
 			cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '/',
 				...sessionCookie.attributes,
+			});
+
+			analytics.identify({
+				userId,
+				traits: {
+					username,
+					email,
+				},
 			});
 
 			await sendVerificationEmail({ email, id: userId });

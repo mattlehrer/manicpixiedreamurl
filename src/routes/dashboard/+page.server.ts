@@ -5,6 +5,7 @@ import { deleteDomain, getDomainsForUser, insertDomain, insertIdea, updateDomain
 import { dev } from '$app/environment';
 import { sendVerificationEmail } from '$lib/server/email';
 import { lucia } from '$lib/server/lucia';
+import { analytics } from '$lib/server/analytics';
 
 const MAX_DOMAINS = 3;
 
@@ -62,6 +63,14 @@ export const actions: Actions = {
 				text: reason,
 			});
 
+			analytics.track({
+				userId: locals.user.id,
+				event: 'Added Domain',
+				properties: {
+					domainId: newDomain[0].id,
+				},
+			});
+
 			return { inserted: true };
 		} catch (error) {
 			console.error(error);
@@ -91,6 +100,14 @@ export const actions: Actions = {
 				text: reason,
 			});
 
+			analytics.track({
+				userId: locals.user.id,
+				event: 'Updated Reason',
+				properties: {
+					domainId,
+				},
+			});
+
 			return { updated };
 		} catch (error) {
 			console.error(error);
@@ -108,6 +125,15 @@ export const actions: Actions = {
 		try {
 			const deleted = await deleteDomain(domainId, locals.session.userId);
 			console.log({ deleted });
+
+			analytics.track({
+				userId: locals.session.userId,
+				event: 'Deleted Domain',
+				properties: {
+					domainId,
+				},
+			});
+
 			return { deleted };
 		} catch (error) {
 			console.error(error);
@@ -124,6 +150,11 @@ export const actions: Actions = {
 			error = e;
 		});
 		if (error) return fail(500, { verificationError: true });
+
+		analytics.track({
+			userId: locals.user.id,
+			event: 'Requested Email Verification',
+		});
 
 		return { sent: true };
 	},

@@ -79,7 +79,6 @@ export const actions: Actions = {
 			userId: existingUser.id,
 			traits: {
 				username: existingUser.username,
-				email: existingUser.email,
 			},
 		});
 

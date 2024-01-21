@@ -112,7 +112,6 @@ export const actions: Actions = {
 				userId,
 				traits: {
 					username,
-					email,
 				},
 			});
 

@@ -1,9 +1,14 @@
+import { logger, transformEvent } from '$lib/server/logger';
 import { lucia } from '$lib/server/lucia';
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
 
 await import('../migrate');
 
 export const handle: Handle = async ({ event, resolve }) => {
+	const startTimer = Date.now();
+	event.locals.startTimer = startTimer;
+	event.locals.requestId = crypto.randomUUID();
+
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {
 		event.locals.user = null;
@@ -28,5 +33,23 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 	event.locals.user = user;
 	event.locals.session = session;
-	return resolve(event);
+	const response = await resolve(event);
+	logger.info({ status: response.status, ...transformEvent(event) });
+	return response;
+};
+
+export const handleError: HandleServerError = ({ event, status, error, message }) => {
+	const errorId = crypto.randomUUID();
+
+	event.locals.errorId = errorId;
+
+	event.locals.error = error?.toString() || undefined;
+	event.locals.errorStackTrace = error instanceof Error ? error?.stack : undefined;
+
+	logger.error({ message, status, ...transformEvent(event) });
+
+	return {
+		message: 'An unexpected error occurred.',
+		errorId,
+	};
 };

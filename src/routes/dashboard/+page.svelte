@@ -531,7 +531,7 @@
 		position: fixed;
 		inset: 0;
 		z-index: 50;
-		background-color: hsl(var(--gray-9-hsl) / 50%);
+		background-color: hsl(var(--gray-9-hsl) / 80%);
 	}
 
 	.dialog {
@@ -544,7 +544,7 @@
 		max-width: 450px;
 		transform: translate(-50%, -50%);
 		border-radius: var(--radius-2);
-		background-color: var(--surface-1);
+		background-color: var(--surface-2);
 		padding: var(--size-3);
 		box-shadow: var(--shadow-2);
 	}

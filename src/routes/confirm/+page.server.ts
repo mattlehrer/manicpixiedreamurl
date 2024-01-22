@@ -1,8 +1,9 @@
 import { deleteEmailVerificationCode, getEmailVerificationCode, updateUser } from '$lib/server/handlers';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { analytics } from '$lib/server/analytics';
 
-export const load = (async ({ url }) => {
+export const load: PageServerLoad = async ({ url }) => {
 	const code = url.searchParams.get('code');
 	if (!code) redirect(302, '/');
 
@@ -14,5 +15,10 @@ export const load = (async ({ url }) => {
 	const updates = await updateUser(user.userId, { hasVerifiedEmail: true });
 	if (!updates.changes) return { error: 'Failed to update user' };
 
+	analytics.track({
+		userId: user.userId,
+		event: 'Email Verified',
+	});
+
 	return { success: true };
-}) satisfies PageServerLoad;
+};

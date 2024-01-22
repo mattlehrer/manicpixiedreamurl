@@ -4,6 +4,7 @@ import { OAuth2RequestError } from 'arctic';
 import { generateId } from 'lucia';
 import type { RequestHandler } from './$types';
 import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
+import { analytics } from '$lib/server/analytics';
 
 const providerId = 'discord';
 
@@ -33,13 +34,24 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 		const oauthUser: DiscordUser = await oauthUserResponse.json();
 
 		const existingUser = await getOauthAccount(providerId, String(oauthUser.id));
-
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.user.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
 				...sessionCookie.attributes,
+			});
+
+			analytics.identify({
+				userId: existingUser.userId,
+			});
+
+			analytics.track({
+				userId: existingUser.userId,
+				event: 'Logged In',
+				properties: {
+					method: 'discord',
+				},
 			});
 		} else {
 			if (!oauthUser.verified) {
@@ -56,7 +68,7 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 				email: oauthUser.email,
 				username: oauthUser.username,
 			});
-			console.log({ newUser });
+
 			if (!newUser || !newUser[0].id) {
 				return new Response(null, {
 					status: 500,
@@ -68,7 +80,20 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 				path: '.',
 				...sessionCookie.attributes,
 			});
+
+			analytics.identify({
+				userId,
+			});
+
+			analytics.track({
+				userId,
+				event: 'Signed Up',
+				properties: {
+					method: 'discord',
+				},
+			});
 		}
+
 		return new Response(null, {
 			status: 302,
 			headers: {

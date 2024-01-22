@@ -111,8 +111,13 @@ export const actions: Actions = {
 
 			analytics.identify({
 				userId,
-				traits: {
-					username,
+			});
+
+			analytics.track({
+				userId,
+				event: 'Signed Up',
+				properties: {
+					method: 'password',
 				},
 			});
 

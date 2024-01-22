@@ -77,8 +77,13 @@ export const actions: Actions = {
 
 		analytics.identify({
 			userId: existingUser.id,
-			traits: {
-				username: existingUser.username,
+		});
+
+		analytics.track({
+			userId: existingUser.id,
+			event: 'Logged In',
+			properties: {
+				method: 'password',
 			},
 		});
 

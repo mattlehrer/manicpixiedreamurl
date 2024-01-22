@@ -4,6 +4,7 @@ import { OAuth2RequestError } from 'arctic';
 import { generateId } from 'lucia';
 import type { RequestHandler } from './$types';
 import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
+import { analytics } from '$lib/server/analytics';
 
 const providerId = 'google';
 
@@ -34,13 +35,24 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 		const oauthUser: GoogleUser = await oauthUserResponse.json();
 
 		const existingUser = await getOauthAccount(providerId, String(oauthUser.sub));
-
 		if (existingUser) {
 			const session = await lucia.createSession(existingUser.user.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			cookies.set(sessionCookie.name, sessionCookie.value, {
 				path: '.',
 				...sessionCookie.attributes,
+			});
+
+			analytics.identify({
+				userId: existingUser.userId,
+			});
+
+			analytics.track({
+				userId: existingUser.userId,
+				event: 'Logged In',
+				properties: {
+					method: 'google',
+				},
 			});
 		} else {
 			const userId = generateId(15);
@@ -51,8 +63,8 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 				email: oauthUser.email,
 				username: oauthUser.name.replaceAll(' ', '_'),
 			});
-			console.log({ newUser });
 			if (!newUser || !newUser[0].id) {
+				locals.message = 'Failed to create user';
 				return new Response(null, {
 					status: 500,
 				});
@@ -63,15 +75,33 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 				path: '.',
 				...sessionCookie.attributes,
 			});
+
+			analytics.identify({
+				userId,
+			});
+
+			analytics.track({
+				userId,
+				event: 'Signed Up',
+				properties: {
+					method: 'google',
+				},
+			});
 		}
+
 		return new Response(null, {
 			status: 302,
 			headers: {
 				Location: '/',
 			},
 		});
-	} catch (e) {
-		console.log({ e });
+	} catch (e: unknown) {
+		if (e instanceof Error) {
+			locals.error = e.message;
+			locals.errorStackTrace = e.stack;
+		} else {
+			locals.error = JSON.stringify(e);
+		}
 		// the specific error message depends on the provider
 		if (e instanceof OAuth2RequestError) {
 			// invalid code

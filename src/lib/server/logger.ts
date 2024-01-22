@@ -15,8 +15,7 @@ export const logger = dev
 					{
 						target: 'pino/file',
 						options: {
-							destination: './logs/app.log',
-							mkdir: true,
+							destination: 1,
 						},
 					},
 					{

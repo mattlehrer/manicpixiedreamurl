@@ -17,6 +17,7 @@ import { dev } from '$app/environment';
 import { Argon2id } from 'oslo/password';
 import { generateId } from 'lucia';
 import { analytics } from '$lib/server/analytics';
+import { logger } from '$lib/server/logger';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (locals.user) {
@@ -92,7 +93,7 @@ export const actions: Actions = {
 			});
 		}
 		try {
-			console.debug('creating user');
+			logger.debug('Creating user', { username, email, request: { requestId: locals.requestId } });
 
 			const userId = generateId(15);
 			const hashedPassword = await new Argon2id().hash(password);

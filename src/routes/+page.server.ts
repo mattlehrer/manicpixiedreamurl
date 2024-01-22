@@ -13,6 +13,7 @@ import { dashboardSites } from '$lib/config';
 import { sendVerificationEmail } from '$lib/server/email';
 import { isProhibitedTextWithReasons } from '$lib/server/moderation';
 import { analytics } from '$lib/server/analytics';
+import { logger } from '$lib/server/logger';
 
 export const actions: Actions = {
 	addSuggestion: async ({ url, locals, request }) => {
@@ -59,8 +60,12 @@ export const actions: Actions = {
 				const reason = Object.entries(reasons.categories).filter(([, bool]) => bool)[0][0];
 				return fail(400, { flagged: reason });
 			}
-		} catch (error) {
-			console.error(error);
+		} catch (error: unknown) {
+			if (typeof error === 'object') {
+				logger.error({ ...error, request: { requestId: locals.requestId } }, 'Error checking idea for prohibited text');
+			} else {
+				logger.error({ error, request: { requestId: locals.requestId } }, 'Error checking idea for prohibited text');
+			}
 		}
 
 		const inserted = await insertIdea({
@@ -119,7 +124,7 @@ export const actions: Actions = {
 		const ideaId = data && data.get('idea');
 
 		if (!locals.session || !locals.user) {
-			console.log({ redirecting: true, session: locals.session });
+			logger.debug({ redirecting: true, request: { requestId: locals.requestId } });
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
 			if (ideaId && typeof ideaId === 'string') redirectTo.searchParams.append('upvote', ideaId);
@@ -155,7 +160,7 @@ export const actions: Actions = {
 		const ideaId = data && data.get('idea');
 
 		if (!locals.session || !locals.user) {
-			console.log({ redirecting: true, session: locals.session });
+			logger.debug({ redirecting: true, request: { requestId: locals.requestId } });
 			const redirectTo = new URL('/signup', dashboardSites[0]);
 			redirectTo.searchParams.append('redirect', url.host);
 			redirect(302, redirectTo);

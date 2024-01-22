@@ -1,4 +1,5 @@
 import { promises } from 'node:dns';
+import { logger } from './logger';
 
 export const getDNSData = async (domain: string) => {
 	try {
@@ -7,9 +8,9 @@ export const getDNSData = async (domain: string) => {
 			address: withResolve4[0],
 		};
 	} catch (error) {
-		console.log('resolve4', error);
+		logger.info('resolve4', error);
 		const withLookup = await promises.lookup(domain);
-		console.log({ r: withLookup });
+		logger.info({ r: withLookup });
 		if (withLookup.address) return { address: withLookup.address };
 		return {
 			address: null,

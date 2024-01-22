@@ -9,6 +9,7 @@ import {
 } from './handlers';
 import { supportEmailAddress, dashboardSites } from '$lib/config';
 import { dev } from '$app/environment';
+import { logger } from './logger';
 const resend = new Resend(RESEND_API_KEY);
 
 export const sendVerificationEmail = async (user: Pick<User, 'email' | 'id'>) => {
@@ -30,7 +31,7 @@ export const sendVerificationEmail = async (user: Pick<User, 'email' | 'id'>) =>
 	const html = `<p>Please confirm your email address by <a href="${link}">clicking this link</a> or pasting this into your browser:</p><p>${link}</p>`;
 
 	if (dev) {
-		console.log({ html });
+		logger.info({ html });
 	} else {
 		const resp = await resend.emails.send({
 			from: supportEmailAddress,
@@ -52,7 +53,7 @@ export const sendPasswordResetEmail = async (user: Pick<User, 'email' | 'id'>) =
 	const html = `<p>You can reset your password by <a href="${link}">clicking this link</a> or pasting this into your browser:</p><p>${link}</p>`;
 
 	if (dev) {
-		console.log({ html });
+		logger.info({ html });
 	} else {
 		const resp = await resend.emails.send({
 			from: supportEmailAddress,

@@ -7,12 +7,13 @@ import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
 
 const providerId = 'google';
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 	const code = url.searchParams.get('code');
 	const state = url.searchParams.get('state');
 	const storedState = cookies.get('oauth_state') ?? null;
 	const storedCodeVerifier = cookies.get('code_verifier') ?? null;
 	if (!code || !state || !storedState || !storedCodeVerifier || state !== storedState) {
+		locals.message = 'Invalid state or code';
 		return new Response(null, {
 			status: 302,
 			headers: {

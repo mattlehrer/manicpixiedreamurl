@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, url, cookies }) => {
+	default: async ({ request, url, cookies, locals }) => {
 		const formData = await request.formData();
 
 		const username = formData.get('username');
@@ -117,8 +117,13 @@ export const actions: Actions = {
 			});
 
 			await sendVerificationEmail({ email, id: userId });
-		} catch (e) {
-			console.error(e);
+		} catch (e: unknown) {
+			if (e instanceof Error) {
+				locals.error = e.message;
+				locals.errorStackTrace = e.stack;
+			} else {
+				locals.error = JSON.stringify(e);
+			}
 			if (e instanceof Database.SqliteError && e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
 				return fail(400, {
 					username,

@@ -7,11 +7,12 @@ import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
 
 const providerId = 'discord';
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 	const code = url.searchParams.get('code');
 	const state = url.searchParams.get('state');
 	const storedState = cookies.get('oauth_state') ?? null;
 	if (!code || !state || !storedState || state !== storedState) {
+		locals.message = 'Invalid state or code';
 		return new Response(null, {
 			status: 302,
 			headers: {
@@ -74,8 +75,13 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				Location: '/',
 			},
 		});
-	} catch (e) {
-		console.log({ e });
+	} catch (e: unknown) {
+		if (e instanceof Error) {
+			locals.error = e.message;
+			locals.errorStackTrace = e.stack;
+		} else {
+			locals.error = JSON.stringify(e);
+		}
 		// the specific error message depends on the provider
 		if (e instanceof OAuth2RequestError) {
 			// invalid code

@@ -50,7 +50,7 @@ export const actions: Actions = {
 			const { flagged, ...reasons } = await isProhibitedTextWithReasons(newIdea);
 
 			if (flagged) {
-				console.log({ newIdea, flagged, reasons });
+				locals.message = `${newIdea} is flagged as inappropriate: ${JSON.stringify(reasons)})}`;
 				await insertFlaggedIdea({
 					ownerId: locals.user.id,
 					domainId,
@@ -189,8 +189,13 @@ export const actions: Actions = {
 		if (locals.user.hasVerifiedEmail) return fail(400, { alreadyVerified: true });
 
 		let error;
-		await sendVerificationEmail({ email: locals.user.email, id: locals.user.id }).catch((e) => {
-			console.error(e);
+		await sendVerificationEmail({ email: locals.user.email, id: locals.user.id }).catch((e: unknown) => {
+			if (e instanceof Error) {
+				locals.error = e.message;
+				locals.errorStackTrace = e.stack;
+			} else {
+				locals.error = JSON.stringify(e);
+			}
 			error = e;
 		});
 		if (error) return fail(500, { verificationError: true });

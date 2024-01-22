@@ -55,7 +55,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 		const domainData = await getDomainByName(url.hostname);
 
 		if (!domainData) {
-			console.error(`Domain not found: ${url.hostname}`);
+			locals.message = `Domain not found: ${url.hostname}`;
 			error(404, 'Not found');
 		}
 

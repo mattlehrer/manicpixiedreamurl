@@ -72,8 +72,13 @@ export const actions: Actions = {
 			});
 
 			return { inserted: true };
-		} catch (error) {
-			console.error(error);
+		} catch (e: unknown) {
+			if (e instanceof Error) {
+				locals.error = e.message;
+				locals.errorStackTrace = e.stack;
+			} else {
+				locals.error = JSON.stringify(e);
+			}
 			return fail(500, { dbError: true });
 		}
 	},
@@ -109,8 +114,13 @@ export const actions: Actions = {
 			});
 
 			return { updated };
-		} catch (error) {
-			console.error(error);
+		} catch (e: unknown) {
+			if (e instanceof Error) {
+				locals.error = e.message;
+				locals.errorStackTrace = e.stack;
+			} else {
+				locals.error = JSON.stringify(e);
+			}
 			return fail(500, { dbError: true });
 		}
 	},
@@ -124,7 +134,7 @@ export const actions: Actions = {
 
 		try {
 			const deleted = await deleteDomain(domainId, locals.session.userId);
-			console.log({ deleted });
+			locals.message = `Deleted domain with id ${domainId}`;
 
 			analytics.track({
 				userId: locals.session.userId,
@@ -135,8 +145,13 @@ export const actions: Actions = {
 			});
 
 			return { deleted };
-		} catch (error) {
-			console.error(error);
+		} catch (e: unknown) {
+			if (e instanceof Error) {
+				locals.error = e.message;
+				locals.errorStackTrace = e.stack;
+			} else {
+				locals.error = JSON.stringify(e);
+			}
 			return fail(500, { error: true });
 		}
 	},
@@ -146,10 +161,17 @@ export const actions: Actions = {
 
 		let error;
 		await sendVerificationEmail({ email: locals.user.email, id: locals.user.id }).catch((e) => {
-			console.error(e);
+			if (e instanceof Error) {
+				locals.error = e.message;
+				locals.errorStackTrace = e.stack;
+			} else {
+				locals.error = JSON.stringify(e);
+			}
 			error = e;
 		});
-		if (error) return fail(500, { verificationError: true });
+		if (error) {
+			return fail(500, { verificationError: true });
+		}
 
 		analytics.track({
 			userId: locals.user.id,

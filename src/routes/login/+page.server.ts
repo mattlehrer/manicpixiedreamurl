@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, url, cookies }) => {
+	default: async ({ request, url, cookies, locals }) => {
 		const formData = await request.formData();
 
 		const username = formData.get('username');
@@ -90,11 +90,25 @@ export const actions: Actions = {
 
 		const upvote = url.searchParams.get('upvote');
 		if (upvote) {
-			await insertUpVote({ ideaId: upvote, userId: existingUser.id }).catch((e) => console.error(e));
+			await insertUpVote({ ideaId: upvote, userId: existingUser.id }).catch((e: unknown) => {
+				if (e instanceof Error) {
+					locals.error = e.message;
+					locals.errorStackTrace = e.stack;
+				} else {
+					locals.error = JSON.stringify(e);
+				}
+			});
 		}
 		const downvote = url.searchParams.get('downvote');
 		if (downvote) {
-			await insertDownVote({ ideaId: downvote, userId: existingUser.id }).catch((e) => console.error(e));
+			await insertDownVote({ ideaId: downvote, userId: existingUser.id }).catch((e: unknown) => {
+				if (e instanceof Error) {
+					locals.error = e.message;
+					locals.errorStackTrace = e.stack;
+				} else {
+					locals.error = JSON.stringify(e);
+				}
+			});
 		}
 
 		redirectTo.searchParams.append('redirect', domain);

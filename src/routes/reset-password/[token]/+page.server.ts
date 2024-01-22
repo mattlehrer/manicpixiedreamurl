@@ -6,7 +6,7 @@ import { isWithinExpirationDate } from 'oslo';
 import { lucia } from '$lib/server/lucia';
 
 export const actions: Actions = {
-	default: async ({ request, url, cookies }) => {
+	default: async ({ request, url, cookies, locals }) => {
 		const token = url.pathname.split('/').pop();
 		if (!token) return fail(400, { invalidToken: true });
 
@@ -48,8 +48,13 @@ export const actions: Actions = {
 				path: '/',
 				...sessionCookie.attributes,
 			});
-		} catch (error) {
-			console.log(error);
+		} catch (e: unknown) {
+			if (e instanceof Error) {
+				locals.error = e.message;
+				locals.errorStackTrace = e.stack;
+			} else {
+				locals.error = JSON.stringify(e);
+			}
 			return fail(500, { serverError: true });
 		}
 

@@ -5,7 +5,7 @@ import { getUserByEmail } from '$lib/server/handlers';
 import { sendPasswordResetEmail } from '$lib/server/email';
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const email = formData.get('email');
@@ -25,14 +25,19 @@ export const actions: Actions = {
 
 		const existingUser = await getUserByEmail(email);
 		if (!existingUser) {
-			console.log(`Password reset request for email ${email} but no user found`);
+			locals.message = `Password reset request for email ${email} but no user found`;
 			return { success: true };
 		}
 
 		try {
 			await sendPasswordResetEmail(existingUser);
-		} catch (error) {
-			console.log(error);
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				locals.error = error.message;
+				locals.errorStackTrace = error.stack;
+			} else {
+				locals.error = JSON.stringify(error);
+			}
 			return fail(500, { serverError: true });
 		}
 

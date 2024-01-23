@@ -27,5 +27,7 @@ jobs:
             git pull origin main
             git status
             pnpm install
+            npx playwright install-deps
+            npx playwright install
             pnpm build
             sudo /usr/bin/systemctl restart manicpixie

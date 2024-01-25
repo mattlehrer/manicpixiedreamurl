@@ -657,6 +657,11 @@
 	}
 
 	.dialog-close:focus {
-		box-shadow: 0px 0px 0px 3px rgb(var(--color-magnum-400) / 1);
+		box-shadow: 0px 0px 0px 3px rgb(var(--blue-4) / 1);
+	}
+
+	textarea#edit-reason {
+		background-color: var(--surface-3);
+		field-sizing: content;
 	}
 </style>

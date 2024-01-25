@@ -145,10 +145,6 @@ input[type='submit'] {
 		border-collapse: revert;
 	}
 
-	table#domains-table textarea {
-		width: calc(100% - var(--size-5));
-	}
-
 	.dash-reason {
 		max-width: max-content;
 	}
@@ -201,4 +197,22 @@ svg.spin {
 #branding svg.logo {
 	height: 7rem;
 	width: auto;
+}
+
+.pricing-cards {
+	display: flex;
+	flex-wrap: wrap;
+	/* gap: var(--size-3); */
+	margin-block: var(--size-8);
+	max-inline-size: var(--size-lg);
+}
+
+.pricing-cards > * {
+	flex-grow: 1;
+	flex-basis: calc((50rem - 100%) * 999);
+}
+
+.pricing-cards > :nth-last-child(n + 4),
+.pricing-cards > :nth-last-child(n + 4) ~ * {
+	flex-basis: 100%;
 }

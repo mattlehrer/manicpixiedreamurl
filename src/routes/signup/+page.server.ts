@@ -102,6 +102,8 @@ export const actions: Actions = {
 
 			await insertPassword({ userId, hashedPassword });
 
+			await lucia.deleteExpiredSessions();
+
 			const session = await lucia.createSession(userId, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			cookies.set(sessionCookie.name, sessionCookie.value, {

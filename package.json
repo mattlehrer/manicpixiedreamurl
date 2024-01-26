@@ -56,7 +56,7 @@
 		"better-sqlite3": "^9.3.0",
 		"drizzle-orm": "^0.29.3",
 		"expiry-map": "^2.0.0",
-		"lucia": "3.0.0-beta.14",
+		"lucia": "3.0.0-beta.15",
 		"lucide-svelte": "^0.312.0",
 		"open-props": "^1.6.17",
 		"openai": "^4.24.7",

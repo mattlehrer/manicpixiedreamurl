@@ -36,6 +36,8 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 
 		const existingUser = await getOauthAccount(providerId, String(oauthUser.sub));
 		if (existingUser) {
+			await lucia.deleteExpiredSessions();
+
 			const session = await lucia.createSession(existingUser.user.id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -69,6 +71,9 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 					status: 500,
 				});
 			}
+
+			await lucia.deleteExpiredSessions();
+
 			const session = await lucia.createSession(newUser[0].id, {});
 			const sessionCookie = lucia.createSessionCookie(session.id);
 			cookies.set(sessionCookie.name, sessionCookie.value, {

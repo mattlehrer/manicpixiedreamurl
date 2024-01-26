@@ -1,0 +1,1 @@
+ALTER TABLE user ADD `resend_contact_id` text;

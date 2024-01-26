@@ -1,7 +1,8 @@
-import { deleteEmailVerificationCode, getEmailVerificationCode, updateUser } from '$lib/server/handlers';
+import { deleteEmailVerificationCode, getEmailVerificationCode, getUserById, updateUser } from '$lib/server/handlers';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { analytics } from '$lib/server/analytics';
+import { addUserToMailingList } from '$lib/server/email';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const code = url.searchParams.get('code');
@@ -19,6 +20,11 @@ export const load: PageServerLoad = async ({ url }) => {
 		userId: user.userId,
 		event: 'Email Verified',
 	});
+
+	const userWithVerifiedEmail = await getUserById(user.userId);
+	if (!userWithVerifiedEmail) return { error: 'Failed to add user to mailing list' };
+	const addedToMailingList = await addUserToMailingList(userWithVerifiedEmail);
+	if (!addedToMailingList?.ok) return { error: 'Failed to add user to mailing list' };
 
 	return { success: true };
 };

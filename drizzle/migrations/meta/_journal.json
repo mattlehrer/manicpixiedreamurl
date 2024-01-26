@@ -85,6 +85,13 @@
       "when": 1705055261301,
       "tag": "0011_early_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1706276532374,
+      "tag": "0012_fixed_wiccan",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { generateId } from 'lucia';
 import type { RequestHandler } from './$types';
 import { getOauthAccount, insertOauthAccount } from '$lib/server/handlers';
 import { analytics } from '$lib/server/analytics';
+import { addUserToMailingList } from '$lib/server/email';
 
 const providerId = 'discord';
 
@@ -76,6 +77,8 @@ export const GET: RequestHandler = async ({ url, cookies, locals }) => {
 					status: 500,
 				});
 			}
+
+			await addUserToMailingList({ id: userId, email: oauthUser.email });
 
 			await lucia.deleteExpiredSessions();
 

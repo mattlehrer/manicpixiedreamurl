@@ -1,15 +1,17 @@
 import { Resend } from 'resend';
-import { RESEND_API_KEY } from '$env/static/private';
+import { RESEND_API_KEY, RESEND_AUDIENCE_ID } from '$env/static/private';
 import {
 	deleteAllEmailVerificationCodesForUser,
 	getAllEmailVerificationCodesForUser,
 	insertEmailVerificationCode,
 	insertPasswordResetToken,
+	updateUser,
 	type User,
 } from './handlers';
 import { supportEmailAddress, dashboardSites } from '$lib/config';
 import { dev } from '$app/environment';
 import { logger } from './logger';
+
 const resend = new Resend(RESEND_API_KEY);
 
 export const sendVerificationEmail = async (user: Pick<User, 'email' | 'id'>) => {
@@ -31,7 +33,7 @@ export const sendVerificationEmail = async (user: Pick<User, 'email' | 'id'>) =>
 	const html = `<p>Please confirm your email address by <a href="${link}">clicking this link</a> or pasting this into your browser:</p><p>${link}</p>`;
 
 	if (dev) {
-		logger.info({ html });
+		console.log({ html });
 	} else {
 		const resp = await resend.emails.send({
 			from: supportEmailAddress,
@@ -53,7 +55,7 @@ export const sendPasswordResetEmail = async (user: Pick<User, 'email' | 'id'>) =
 	const html = `<p>You can reset your password by <a href="${link}">clicking this link</a> or pasting this into your browser:</p><p>${link}</p>`;
 
 	if (dev) {
-		logger.info({ html });
+		console.log({ html });
 	} else {
 		const resp = await resend.emails.send({
 			from: supportEmailAddress,
@@ -64,5 +66,25 @@ export const sendPasswordResetEmail = async (user: Pick<User, 'email' | 'id'>) =
 
 		if (resp.error) throw new Error('Failed to send email');
 	}
+	return { ok: true };
+};
+
+export const addUserToMailingList = async (user: Pick<User, 'email' | 'id'>) => {
+	const resp: {
+		data: { object: string; id: string } | null;
+		error: Error | null;
+	} = await resend.contacts.create({
+		audienceId: RESEND_AUDIENCE_ID,
+		email: user.email,
+		unsubscribed: false,
+	});
+
+	logger.info({ msg: 'Adding user to mailing list', resp });
+
+	if (!resp.data?.id) throw new Error('Failed to add user to mailing list');
+
+	const update = await updateUser(user.id, { resendContactId: resp.data.id });
+	logger.info({ msg: 'Added user to resend audience', update });
+
 	return { ok: true };
 };

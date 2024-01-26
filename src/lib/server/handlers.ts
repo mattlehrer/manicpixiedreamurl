@@ -41,7 +41,14 @@ export const getUserByEmail = (email: string) => {
 	});
 };
 
+export const getUserById = (id: string) => {
+	return db.query.user.findFirst({
+		where: (user, { eq }) => eq(user.id, id),
+	});
+};
+
 export const updateUser = (userId: string, data: Partial<User>) => {
+	console.log({ userId, data });
 	return db
 		.update(user)
 		.set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })

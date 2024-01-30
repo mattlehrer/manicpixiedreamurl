@@ -526,11 +526,6 @@
 		animation: var(--animation-scale-up) 0.2s forwards;
 	}
 
-	.delete-dialog {
-		top: 50%;
-		transform: translate(-50%, -50%);
-	}
-
 	.dialog-actions input[type='submit'].delete-dialog-primary {
 		text-wrap: wrap;
 		height: auto;

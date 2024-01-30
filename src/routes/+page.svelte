@@ -6,8 +6,9 @@
 	import DomainReason from '$lib/components/DomainReason.svelte';
 	import { enhance } from '$app/forms';
 	import { queryParam, ssp } from 'sveltekit-search-params';
+	import { createDialog, melt } from '@melt-ui/svelte';
 	import { onMount } from 'svelte';
-	import { fade, slide } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import DomainDiscovery from '$lib/components/DomainDiscovery.svelte';
 	import { flip } from 'svelte/animate';
 
@@ -23,7 +24,25 @@
 			// remove token from url after use
 			$token = null;
 		}
+		$open = true;
 	});
+
+	$: if (form?.inserted) {
+		$open = true;
+	}
+
+	const {
+		elements: {
+			// trigger,
+			overlay,
+			content,
+			title,
+			description,
+			close,
+			portalled,
+		},
+		states: { open },
+	} = createDialog();
 </script>
 
 <svelte:head>
@@ -98,6 +117,55 @@
 		</section>
 
 		<DomainDiscovery discoveryDomains={data.discoveryDomains} other={true} />
+	</div>
+
+	<div use:melt={$portalled}>
+		{#if $open}
+			<div use:melt={$overlay} class="dialog-bg" />
+			<div
+				class="dialog"
+				transition:fly={{
+					duration: 200,
+					y: 8,
+				}}
+				use:melt={$content}
+			>
+				{#if form?.inserted}
+					<p class="notice success">Thanks for that idea! We've added it to the list.</p>
+				{/if}
+				<h2 use:melt={$title} class="dialog-title">
+					Got an idea for <a href={`//${form?.nextDomain?.name}`}>{form?.nextDomain?.name}</a>?
+				</h2>
+				<p use:melt={$description} class="dialog-description">The best ideas right now are:</p>
+				<ul>
+					{#each form?.nextDomain?.ideas ?? [] as idea}
+						<li>{idea.text}</li>
+					{/each}
+				</ul>
+
+				<form method="POST" action="?/anotherSuggestion" use:enhance>
+					<label for="idea"> {form?.nextDomain?.name} should be... </label>
+					<input id="idea" name="idea" type="text" />
+					<input type="hidden" name="domainId" value={form?.nextDomain?.id} />
+					<div class="dialog-actions">
+						<button type="submit" class="dialog-primary"> Submit Idea </button>
+						<button class="dialog-secondary" formaction="?/skipDomain"> Maybe for another domain </button>
+					</div>
+				</form>
+
+				<button use:melt={$close} aria-label="close" class="dialog-close">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+					>
+				</button>
+			</div>
+		{/if}
 	</div>
 {:else}
 	<!-- 404 from +page.server -->
@@ -239,5 +307,42 @@
 	sup {
 		margin-inline-start: 0.25em;
 		color: var(--pink-6);
+	}
+
+	.notice {
+		font-size: var(--font-size-2);
+		margin-block: var(--size-6);
+	}
+
+	.dialog ul {
+		padding-block-start: 0;
+		list-style: disc inside;
+	}
+
+	.dialog li {
+		display: list-item;
+		padding-inline: var(--size-4);
+		font-size: var(--font-size-2);
+		margin: 0;
+	}
+
+	.dialog label {
+		font-size: var(--font-size-3);
+	}
+
+	.dialog input {
+		background-color: var(--surface-3);
+		outline: solid var(--surface-4);
+		caret-color: var(--pink-6);
+	}
+
+	.dialog input:focus {
+		outline: solid var(--pink-6);
+	}
+
+	.dialog-actions {
+		width: 100%;
+		justify-content: flex-start;
+		flex-direction: row-reverse;
 	}
 </style>

@@ -341,3 +341,129 @@ svg.spin {
 	height: var(--size-5);
 	color: var(--green-7);
 }
+
+.dialog-bg {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	background-color: hsl(var(--gray-9-hsl) / 80%);
+}
+
+.dialog {
+	position: fixed;
+	left: 50%;
+	top: 30%;
+	z-index: 50;
+	max-height: 85vh;
+	width: 90vw;
+	max-width: 450px;
+	transform: translate(-50%, 0%);
+	border-radius: var(--radius-2);
+	background-color: var(--surface-2);
+	padding: var(--size-3);
+	box-shadow: var(--shadow-2);
+}
+
+.dialog-title {
+	margin: 0;
+	padding-inline-end: var(--size-5);
+	font-size: var(--font-size-3);
+	line-height: var(--font-lineheight-1);
+	font-weight: var(--font-weight-6);
+	color: rgb(var(--text-1) / 1);
+}
+
+.dialog-description {
+	/* margin-bottom: 1.25rem;
+	margin-top: 0.5rem; */
+	margin-block-start: var(--size-3);
+	margin-block-end: var(--size-4);
+	line-height: var(--font-lineheight-2);
+	font-size: var(--font-size-2);
+
+	color: var(--text-2);
+}
+
+.dialog-actions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: var(--size-3);
+
+	margin-top: var(--size-6);
+}
+
+.dialog-actions form {
+	margin: 0;
+	display: flex;
+	flex-direction: row;
+	gap: 1rem;
+	align-items: center;
+}
+
+.dialog-actions form input[type='submit'] {
+	margin: 0;
+}
+
+.dialog-actions button,
+.dialog-actions input[type='submit'] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	min-height: 2rem;
+
+	border-radius: var(--radius-2);
+
+	padding: var(--size-1) var(--size-2);
+
+	font-weight: var(--font-weight-4);
+	line-height: 1;
+	--_ink-shadow: 0;
+}
+
+.dialog-actions button.dialog-secondary {
+	background-color: rgb(var(--gray-2) / 1);
+
+	color: var(--blue-6);
+}
+
+.dialog-actions input[type='submit'] {
+	margin-block-start: 0;
+}
+
+.dialog-actions input[type='submit'].dialog-primary {
+	background-color: var(--blue-0);
+	color: var(--blue-8);
+}
+
+.dialog-close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	position: absolute;
+	right: 10px;
+	top: 10px;
+
+	appearance: none;
+
+	height: var(--size-5);
+	width: var(--size-5);
+
+	border-radius: var(--radius-6);
+
+	color: var(--text-2);
+	padding: 0;
+	background-color: inherit;
+	border: none;
+	box-shadow: none;
+}
+
+.dialog-close:hover {
+	background-color: var(--surface-2);
+}
+
+.dialog-close:focus {
+	box-shadow: 0px 0px 0px 3px rgb(var(--blue-4) / 1);
+}

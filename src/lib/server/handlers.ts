@@ -258,8 +258,12 @@ export const getRandomDomains = async (limit: number, domainId: string = '') => 
 };
 
 export const insertIdea = async ({ domainId, ownerId, text }: { domainId: string; ownerId: string; text: string }) => {
-	const insertedIdea = await db.insert(idea).values({ domainId, ownerId, text }).returning({ id: idea.id });
-	await insertUpVote({ ideaId: insertedIdea[0].id, userId: ownerId });
+	const insertedIdea = await db
+		.insert(idea)
+		.values({ domainId, ownerId, text })
+		.returning({ id: idea.id })
+		.then((r) => r[0]);
+	await insertUpVote({ ideaId: insertedIdea.id, userId: ownerId });
 	return insertedIdea;
 };
 

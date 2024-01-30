@@ -9,6 +9,7 @@
 	import { onMount } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
 	import DomainDiscovery from '$lib/components/DomainDiscovery.svelte';
+	import { flip } from 'svelte/animate';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -56,17 +57,16 @@
 			{/if}
 			<h3>Vote on the best ideas so far:</h3>
 			<ul>
-				{#each data.ideas as idea}
-					{@const score = idea.votes.reduce((acc, vote) => acc + vote.type, 0)}
+				{#each data.ideas as idea (idea.id)}
 					{@const existingVote = data.userId && idea.votes.find((vote) => vote.userId === data.userId)}
-					<li>
+					<li animate:flip={{ duration: 500 }}>
 						<form class="vote" method="post" use:enhance>
 							<input type="hidden" name="idea" value={idea.id} />
 							<button
 								class:voted={existingVote && existingVote?.type === 1}
 								formaction={existingVote && existingVote?.type === 1 ? '?/unvote' : '?/upvote'}>^</button
 							>
-							<span style={`margin-left: ${score < 0 ? '-1ch' : '0'}`}>{score}</span>
+							<span style={`margin-left: ${idea.score < 0 ? '-1ch' : '0'}`}>{idea.score}</span>
 							<button
 								class="flip"
 								class:voted={existingVote && existingVote?.type === -1}

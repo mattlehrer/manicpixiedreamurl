@@ -59,14 +59,17 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 			error(404, 'Not found');
 		}
 
-		const ideaData = (await getIdeasWithVotesForDomainId(domainData.id)).map((idea) => ({
-			...idea,
-			isDomainOwners: idea.ownerId === domainData.ownerId,
-			votes: idea.votes.map((vote) => ({
-				...vote,
-				userId: vote.userId === userId ? userId : undefined,
-			})),
-		}));
+		const ideaData = (await getIdeasWithVotesForDomainId(domainData.id))
+			.map((idea) => ({
+				...idea,
+				isDomainOwners: idea.ownerId === domainData.ownerId,
+				votes: idea.votes.map((vote) => ({
+					...vote,
+					userId: vote.userId === userId ? userId : undefined,
+				})),
+				score: idea.votes.reduce((acc, vote) => acc + vote.type, 0),
+			}))
+			.sort((a, b) => b.score - a.score);
 
 		const newIdea = url.searchParams.get('idea') ?? '';
 

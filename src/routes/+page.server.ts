@@ -210,7 +210,7 @@ export const actions: Actions = {
 			},
 		});
 
-		return { inserted };
+		return { vote: inserted };
 	},
 	upvote: async ({ url, locals, request }) => {
 		const data = await request.formData();
@@ -246,7 +246,7 @@ export const actions: Actions = {
 			},
 		});
 
-		return { inserted };
+		return { upvote: inserted };
 	},
 	unvote: async ({ url, locals, request }) => {
 		const data = await request.formData();
@@ -261,7 +261,7 @@ export const actions: Actions = {
 
 		if (!ideaId || typeof ideaId !== 'string') return fail(400, { message: 'Invalid request' });
 
-		const inserted = await removeVote({
+		await removeVote({
 			userId: locals.user.id,
 			ideaId,
 		});
@@ -275,7 +275,7 @@ export const actions: Actions = {
 			},
 		});
 
-		return { inserted };
+		return { unvote: true };
 	},
 	resendVerification: async ({ locals }) => {
 		if (!locals.session || !locals.user) return fail(401);

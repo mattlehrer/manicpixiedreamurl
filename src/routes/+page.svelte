@@ -24,7 +24,6 @@
 			// remove token from url after use
 			$token = null;
 		}
-		$open = true;
 	});
 
 	$: if (form?.inserted) {

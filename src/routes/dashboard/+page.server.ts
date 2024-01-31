@@ -41,6 +41,7 @@ export const actions: Actions = {
 
 		// check that this is just a domain name
 		const parseResult = parseDomain(domain);
+		if (dev && !domain.endsWith('.test')) return fail(400, { domain, invalid: true });
 		if (!dev && ![ParseResultType.Listed, ParseResultType.NotListed].includes(parseResult.type))
 			return fail(400, { domain, invalid: true });
 

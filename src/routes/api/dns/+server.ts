@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.session) return error(401);
 
 	const { domain, id } = await request.json();
-	if (!domain || typeof domain !== 'string') return error(400, { message: 'Bad domain' });
+	if (!domain || typeof domain !== 'string' || domain.includes(' ')) return error(400, { message: 'Bad domain' });
 
 	const d = await getDomainById(id);
 	if (!d) return error(404, { message: 'Not found' });

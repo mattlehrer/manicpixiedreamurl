@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import LoadingSpinner from '$lib/assets/LoadingSpinner.svelte';
 	import type { Domain } from '$lib/server/handlers';
 
@@ -7,7 +8,7 @@
 	let bareDns: boolean | undefined = undefined;
 	let wwwDns: boolean | undefined = undefined;
 
-	$: if (!domain.bareDNSisVerified) {
+	$: if (browser && !domain.bareDNSisVerified) {
 		fetch('/api/dns', {
 			method: 'POST',
 			headers: {
@@ -21,16 +22,19 @@
 						bareDns = ok;
 						domain.bareDNSisVerified = ok;
 					});
+				} else {
+					bareDns = false;
 				}
 			})
 			.catch((e) => {
 				console.log(e);
+				bareDns = false;
 			});
 	} else {
 		bareDns = true;
 	}
 
-	$: if (!domain.wwwDNSisVerified) {
+	$: if (browser && !domain.wwwDNSisVerified) {
 		fetch('/api/dns', {
 			method: 'POST',
 			headers: {
@@ -44,10 +48,13 @@
 						wwwDns = ok;
 						domain.wwwDNSisVerified = ok;
 					});
+				} else {
+					wwwDns = false;
 				}
 			})
 			.catch((e) => {
 				console.log(e);
+				wwwDns = false;
 			});
 	} else {
 		wwwDns = true;

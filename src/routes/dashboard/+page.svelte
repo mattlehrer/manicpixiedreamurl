@@ -7,45 +7,40 @@
 	import { fade, fly, slide } from 'svelte/transition';
 	import { dev } from '$app/environment';
 	import { aRecord } from '$lib/config';
+	import type { ActionData, PageData } from './$types';
 
-	let { data, form } = $props();
-	let innerHeight = $state(500);
-	let innerWidth = $state(500);
+	export let data: PageData;
+	export let form: ActionData;
 
-	let reason: string = $state(form ? String(form?.reason) : '');
-	let domain: string = $state(form ? String(form?.domain) : '');
+	let innerHeight = 500;
+	let innerWidth = 500;
 
-	let removeDomain: { id: string; name: string } | null = $state(null);
-	let editDomain: { id: string; name: string; reason: string } | null = $state(null);
+	let reason: string = form ? String(form?.reason) : '';
+	let domain: string = form ? String(form?.domain) : '';
 
-	$effect(() => {
-		if (!$openEditDialog) {
-			removeDomain = null;
-		}
-	});
-	$effect(() => {
-		if (!$openDeleteDomainDialog) {
-			removeDomain = null;
-		}
-	});
+	let removeDomain: { id: string; name: string } | null = null;
+	let editDomain: { id: string; name: string; reason: string } | null = null;
+	let mightBeAbleToAddDomain = true;
 
-	let mightBeAbleToAddDomain = $state(true);
+	$: if (!$openEditDialog) {
+		removeDomain = null;
+	}
 
-	$effect(() => {
-		if (data.domains.length >= data.maxDomains) {
-			mightBeAbleToAddDomain = false;
-		}
-		if (data.domains.some((d) => !d.bareDNSisVerified || !d.wwwDNSisVerified)) {
-			mightBeAbleToAddDomain = false;
-		}
-	});
+	$: if (!$openDeleteDomainDialog) {
+		removeDomain = null;
+	}
 
-	$effect(() => {
-		if (form?.inserted) {
-			reason = '';
-			domain = '';
-		}
-	});
+	$: if (data.domains.length >= data.maxDomains) {
+		mightBeAbleToAddDomain = false;
+	}
+	if (data.domains.some((d) => !d.bareDNSisVerified || !d.wwwDNSisVerified)) {
+		mightBeAbleToAddDomain = false;
+	}
+
+	$: if (form?.inserted) {
+		reason = '';
+		domain = '';
+	}
 
 	const {
 		elements: {
@@ -263,7 +258,7 @@
 						<button
 							use:melt={$triggerEditDialog}
 							class="edit-btn"
-							onclick={() => {
+							on:click={() => {
 								editDomain = domain;
 							}}
 						>
@@ -326,7 +321,7 @@
 						use:melt={$triggerDeleteDialog}
 						id="remove-domain"
 						class="remove-btn"
-						onclick={() => {
+						on:click={() => {
 							removeDomain = editDomain;
 						}}
 					>

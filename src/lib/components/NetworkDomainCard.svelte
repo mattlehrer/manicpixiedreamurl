@@ -2,7 +2,7 @@
 	import { dev } from '$app/environment';
 	import type { getRandomDomains } from '$lib/server/handlers';
 
-	let { domain } = $props<{ domain: Awaited<ReturnType<typeof getRandomDomains>>[number] }>();
+	export let domain: Awaited<ReturnType<typeof getRandomDomains>>[number];
 </script>
 
 <article>

@@ -1,10 +1,7 @@
 <script lang="ts">
-	import type { ActionData } from './$types';
 	import Wantrepreneur from './Wantrepreneur.svelte';
 	import Collector from './Collector.svelte';
 	import Hoarder from './Hoarder.svelte';
-
-	export let form: ActionData;
 </script>
 
 <h1>Pricing</h1>

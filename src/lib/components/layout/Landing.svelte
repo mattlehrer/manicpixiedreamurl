@@ -2,10 +2,8 @@
 	import DomainDiscovery from '$lib/components/DomainDiscovery.svelte';
 	import type { getRandomDomains } from '$lib/server/handlers';
 
-	let { loggedIn, discoveryDomains } = $props<{
-		loggedIn: boolean;
-		discoveryDomains: Awaited<ReturnType<typeof getRandomDomains>>;
-	}>();
+	export let loggedIn: boolean;
+	export let discoveryDomains: Awaited<ReturnType<typeof getRandomDomains>>;
 </script>
 
 <h1>Manic Pixie Dream URL</h1>
@@ -43,30 +41,7 @@
 		color: var(--text-2);
 	}
 
-	section.domain-discovery {
-		margin-block-start: var(--size-fluid-5);
-		padding-block: var(--size-fluid-4);
-	}
-
-	h3 {
-		margin-block-end: var(--size-fluid-2);
-	}
-
 	.cta {
 		font-size: var(--font-size-5);
-	}
-
-	ul {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--size-fluid-3);
-		list-style: none;
-		padding: 0;
-	}
-
-	li {
-		max-width: 320px;
-		flex: 0 1 320px;
-		padding: 0;
 	}
 </style>

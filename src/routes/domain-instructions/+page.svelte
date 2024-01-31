@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { aRecord, dashboardSites } from '$lib/config';
-	import type { PageData } from './$types';
-
-	export let data: PageData;
 </script>
 
 <svelte:head>

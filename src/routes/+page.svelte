@@ -171,19 +171,6 @@
 {/if}
 
 <style>
-	nav {
-		display: flex;
-		justify-content: end;
-		align-items: center;
-		padding-inline: var(--size-fluid-2);
-		padding-block: var(--size-fluid-2);
-	}
-
-	nav a,
-	nav a:visited {
-		color: var(--text-1);
-	}
-
 	h1 {
 		font-size: var(--font-size-fluid-3);
 		margin-block-end: 2rem;

@@ -2,57 +2,56 @@
 	import LoadingSpinner from '$lib/assets/LoadingSpinner.svelte';
 	import type { Domain } from '$lib/server/handlers';
 
-	let { domain } = $props<{ domain: Domain }>();
+	export let domain: Domain;
 
-	let bareDns: boolean | undefined = $state(undefined);
-	let wwwDns: boolean | undefined = $state(undefined);
+	let bareDns: boolean | undefined = undefined;
+	let wwwDns: boolean | undefined = undefined;
 
-	$effect(() => {
-		if (!domain.bareDNSisVerified) {
-			fetch('/api/dns', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ domain: domain.name, id: domain.id }),
+	$: if (!domain.bareDNSisVerified) {
+		fetch('/api/dns', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ domain: domain.name, id: domain.id }),
+		})
+			.then((res) => {
+				if (res.ok) {
+					res.json().then(({ ok }) => {
+						bareDns = ok;
+						domain.bareDNSisVerified = ok;
+					});
+				}
 			})
-				.then((res) => {
-					if (res.ok) {
-						res.json().then(({ ok }) => {
-							bareDns = ok;
-							domain.bareDNSisVerified = ok;
-						});
-					}
-				})
-				.catch((e) => {
-					console.log(e);
-				});
-		} else {
-			bareDns = true;
-		}
-		if (!domain.wwwDNSisVerified) {
-			fetch('/api/dns', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ domain: `www.${domain.name}`, id: domain.id }),
+			.catch((e) => {
+				console.log(e);
+			});
+	} else {
+		bareDns = true;
+	}
+
+	$: if (!domain.wwwDNSisVerified) {
+		fetch('/api/dns', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ domain: `www.${domain.name}`, id: domain.id }),
+		})
+			.then((res) => {
+				if (res.ok) {
+					res.json().then(({ ok }) => {
+						wwwDns = ok;
+						domain.wwwDNSisVerified = ok;
+					});
+				}
 			})
-				.then((res) => {
-					if (res.ok) {
-						res.json().then(({ ok }) => {
-							wwwDns = ok;
-							domain.wwwDNSisVerified = ok;
-						});
-					}
-				})
-				.catch((e) => {
-					console.log(e);
-				});
-		} else {
-			wwwDns = true;
-		}
-	});
+			.catch((e) => {
+				console.log(e);
+			});
+	} else {
+		wwwDns = true;
+	}
 </script>
 
 {#if bareDns !== undefined && wwwDns !== undefined}

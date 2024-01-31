@@ -43,7 +43,7 @@ export const handleError: HandleServerError = ({ event, status, error, message }
 
 	event.locals.errorId = errorId;
 
-	event.locals.error = error?.toString() || undefined;
+	event.locals.error = error ? JSON.stringify(error) : undefined;
 	event.locals.errorStackTrace = error instanceof Error ? error?.stack : undefined;
 
 	logger.error({ message, status, ...transformEvent(event) });

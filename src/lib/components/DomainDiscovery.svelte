@@ -2,10 +2,8 @@
 	import type { getRandomDomains } from '$lib/server/handlers';
 	import NetworkDomainCard from './NetworkDomainCard.svelte';
 
-	let { discoveryDomains, other } = $props<{
-		discoveryDomains: Awaited<ReturnType<typeof getRandomDomains>>;
-		other: boolean;
-	}>();
+	export let discoveryDomains: Awaited<ReturnType<typeof getRandomDomains>>;
+	export let other: boolean;
 
 	// $inspect(discoveryDomains);
 </script>
@@ -22,14 +20,6 @@
 </section>
 
 <style>
-	h1 {
-		color: var(--pink-6);
-	}
-
-	h2 {
-		color: var(--text-2);
-	}
-
 	section.domain-discovery {
 		margin-block-start: var(--size-fluid-2);
 		padding-block: var(--size-fluid-4);
@@ -40,10 +30,6 @@
 		font-weight: var(--font-weight-7);
 		line-height: var(--font-lineheight-0);
 		margin-block-end: var(--size-fluid-2);
-	}
-
-	.cta {
-		font-size: var(--font-size-5);
 	}
 
 	ul {

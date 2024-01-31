@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { PageData, ActionData } from './$types';
+	import type { ActionData } from './$types';
 
 	export let form: ActionData;
-	export let data: PageData;
 </script>
 
 <h1>Reset your password</h1>

@@ -56,7 +56,7 @@
 		height: 630px;
 		background: var(--gradient-8);
 		color: var(--gray-1);
-		overflow:;
+		overflow: hidden;
 	}
 
 	p {

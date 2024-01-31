@@ -1,10 +1,17 @@
+import { sequence } from '@sveltejs/kit/hooks';
+import * as Sentry from '@sentry/sveltekit';
 import { logger, transformEvent } from '$lib/server/logger';
 import { lucia } from '$lib/server/lucia';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
+Sentry.init({
+	dsn: 'https://35b54933d302a34621ae4ce110e1fb37@o4506605288685568.ingest.sentry.io/4506605292421120',
+	tracesSampleRate: 1,
+});
+
 await import('../migrate');
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, resolve }) => {
 	const startTimer = Date.now();
 	event.locals.startTimer = startTimer;
 	event.locals.requestId = crypto.randomUUID();
@@ -36,9 +43,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 	logger.info({ status: response.status, ...transformEvent(event) });
 	return response;
-};
+});
 
-export const handleError: HandleServerError = ({ event, status, error, message }) => {
+export const handleError: HandleServerError = Sentry.handleErrorWithSentry(({ event, status, error, message }) => {
 	const errorId = crypto.randomUUID();
 
 	event.locals.errorId = errorId;
@@ -52,4 +59,4 @@ export const handleError: HandleServerError = ({ event, status, error, message }
 		message: 'An unexpected error occurred.',
 		errorId,
 	};
-};
+});

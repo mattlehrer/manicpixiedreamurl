@@ -11,3 +11,6 @@ vite.config.ts.timestamp-*
 sqlite.db
 sql*.db
 .sentryclirc
+
+# Sentry Config File
+.sentryclirc

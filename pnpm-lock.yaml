@@ -20,6 +20,9 @@ dependencies:
   '@paralleldrive/cuid2':
     specifier: ^2.2.2
     version: 2.2.2
+  '@sentry/cli':
+    specifier: ^2.27.0
+    version: 2.27.0
   '@sentry/sveltekit':
     specifier: ^7.99.0
     version: 7.99.0(@sveltejs/kit@2.5.0)(svelte@4.2.9)

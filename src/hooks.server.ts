@@ -3,8 +3,11 @@ import * as Sentry from '@sentry/sveltekit';
 import { logger, transformEvent } from '$lib/server/logger';
 import { lucia } from '$lib/server/lucia';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 
 Sentry.init({
+	environment: dev ? 'development' : 'production',
+	release: 'sveltekit-sentry@' + process.env.npm_package_version,
 	dsn: 'https://35b54933d302a34621ae4ce110e1fb37@o4506605288685568.ingest.sentry.io/4506605292421120',
 	tracesSampleRate: 1,
 });

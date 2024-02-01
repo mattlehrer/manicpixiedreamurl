@@ -11,18 +11,30 @@
 	import { fade, fly, slide } from 'svelte/transition';
 	import DomainDiscovery from '$lib/components/DomainDiscovery.svelte';
 	import { flip } from 'svelte/animate';
+	import type { Writable } from 'svelte/store';
 
 	export let data: PageData;
 	export let form: ActionData;
 
-	const token = queryParam('token', ssp.string(), {
-		pushHistory: false,
-	});
+	let token: Writable<string | null>;
+
+	try {
+		token = queryParam('token', ssp.string(), {
+			pushHistory: false,
+		});
+	} catch (error) {
+		// uses structuredClone and will throw on old browsers
+		console.error(error);
+	}
 
 	onMount(() => {
 		if ($token?.length) {
 			// remove token from url after use
-			$token = null;
+			try {
+				$token = null;
+			} catch (error) {
+				console.error(error);
+			}
 		}
 	});
 

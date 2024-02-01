@@ -1,11 +1,10 @@
 import { dev } from '$app/environment';
 import { handleErrorWithSentry, Replay } from '@sentry/sveltekit';
 import * as Sentry from '@sentry/sveltekit';
-import { npm_package_version } from '$env/static/private';
 
 Sentry.init({
 	environment: dev ? 'development' : 'production',
-	release: 'sveltekit-sentry@' + npm_package_version,
+	release: 'sveltekit-sentry@' + import.meta.env.PACKAGE_VERSION,
 
 	dsn: 'https://35b54933d302a34621ae4ce110e1fb37@o4506605288685568.ingest.sentry.io/4506605292421120',
 	tracesSampleRate: 1.0,

@@ -9,11 +9,15 @@ export const getDNSData = async (domain: string) => {
 		};
 	} catch (error) {
 		logger.info('resolve4', error);
+	}
+	try {
 		const withLookup = await promises.lookup(domain);
 		logger.info({ r: withLookup });
 		if (withLookup.address) return { address: withLookup.address };
-		return {
-			address: null,
-		};
+	} catch (error) {
+		logger.info('lookup', error);
 	}
+	return {
+		address: null,
+	};
 };

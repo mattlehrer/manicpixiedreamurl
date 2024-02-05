@@ -8,14 +8,14 @@ export const getDNSData = async (domain: string) => {
 			address: withResolve4[0],
 		};
 	} catch (error) {
-		logger.info('resolve4', error);
+		logger.info(`node:dns resolve4 error for ${domain}`, JSON.stringify(error));
 	}
 	try {
 		const withLookup = await promises.lookup(domain);
 		logger.info({ r: withLookup });
 		if (withLookup.address) return { address: withLookup.address };
 	} catch (error) {
-		logger.info('lookup', error);
+		logger.info(`node:dns lookup error for ${domain}`, JSON.stringify(error));
 	}
 	return {
 		address: null,

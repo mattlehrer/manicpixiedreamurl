@@ -1,4 +1,3 @@
-# /etc/caddy/Caddyfile
 {
 	on_demand_tls {
 		ask http://localhost:3000/api/caddy/check
@@ -14,12 +13,12 @@ datasette.manicpixiedreamurl.com {
 	rate_limit {
 		zone static {
 			key static
-			events 25
+			events 50
 			window 30s
 		}
 	}
 	basicauth * {
-		matt {$CADDY_HASHED_PWD}
+		matt $2a$14$WXZcOPxRWLk4qpFMx7VDduFp276pFTQHJhTTtAT.zsuATbKeSpxNa
 	}
 	reverse_proxy localhost:8000
 }
@@ -44,5 +43,14 @@ https:// {
 	tls {
 		on_demand
 	}
+
+	respond /**/*.php "Access denied" 403 {
+		close
+	}
+
+	respond /*.php "Access denied" 403 {
+		close
+	}
+
 	reverse_proxy localhost:3000
 }

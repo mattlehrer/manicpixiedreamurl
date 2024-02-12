@@ -10,6 +10,7 @@ Sentry.init({
 	release: 'sveltekit-sentry@' + import.meta.env.PACKAGE_VERSION,
 	dsn: 'https://35b54933d302a34621ae4ce110e1fb37@o4506605288685568.ingest.sentry.io/4506605292421120',
 	tracesSampleRate: 1,
+	denyUrls: [/api\/caddy/, /screenshots/],
 });
 
 await import('../migrate');

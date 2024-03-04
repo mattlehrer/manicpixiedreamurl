@@ -17,16 +17,6 @@
 </script>
 
 <svelte:head>
-	{#if !dev}
-		<script
-			defer
-			event-site={data.host}
-			event-logged_in={data.loggedIn}
-			data-domain="manicpixiedreamurl.com"
-			src="/js/script.js"
-		></script>
-	{/if}
-
 	{#if !data.domain}
 		<title>Manic Pixie Dream URL is a social network for parked domains</title>
 		<meta content={ogUrl.href} property="og:image" />
@@ -54,6 +44,15 @@
 			name="description"
 			content={`Someone bought this domain and hasn't given up on it yet. What would you build?`}
 		/>
+	{/if}
+	{#if !dev}
+		<script
+			defer
+			event-site={data.host}
+			event-logged_in={data.loggedIn}
+			data-domain="manicpixiedreamurl.com"
+			src="/js/script.js"
+		></script>
 	{/if}
 	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>

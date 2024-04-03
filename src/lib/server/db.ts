@@ -5,4 +5,37 @@ import * as schema from '$lib/schema';
 import { fileURLToPath } from 'node:url';
 
 export const sqliteDatabase = new sqlite(dirname(fileURLToPath(import.meta.url)) + '/../../../sqlite.db');
+
+// https://kerkour.com/sqlite-for-servers
+try {
+	sqliteDatabase.pragma('journal_mode = WAL');
+} catch (error) {
+	console.log('Sqlite error: Failed to set WAL mode', error);
+}
+try {
+	sqliteDatabase.pragma('busy_timeout = 5000');
+} catch (error) {
+	console.log('Sqlite error: Failed to set busy_timeout', error);
+}
+try {
+	sqliteDatabase.pragma('synchronous = NORMAL');
+} catch (error) {
+	console.log('Sqlite error: Failed to set synchronous', error);
+}
+try {
+	sqliteDatabase.pragma('cache_size = 1000000000');
+} catch (error) {
+	console.log('Sqlite error: Failed to set cache_size', error);
+}
+try {
+	sqliteDatabase.pragma('foreign_keys = true');
+} catch (error) {
+	console.log('Sqlite error: Failed to set foreign_keys', error);
+}
+try {
+	sqliteDatabase.pragma('temp_store = memory');
+} catch (error) {
+	console.log('Sqlite error: Failed to set temp_store', error);
+}
+
 export const db = drizzle(sqliteDatabase, { schema });

@@ -3,6 +3,12 @@
 		ask http://localhost:3000/api/caddy/check
 	}
 	order rate_limit before basicauth
+	order cache before rewrite
+	cache {
+		headers Content-Type Authorization
+		allowed_http_verbs GET
+		log_level info
+	}
 }
 
 www.manicpixiedreamurl.com {
@@ -50,6 +56,19 @@ https:// {
 
 	respond /*.php "Access denied" 403 {
 		close
+	}
+
+	route {
+		@ogimage {
+			host *
+			path /og/image
+		}
+		route @ogimage {
+			reverse_proxy localhost:3000
+			cache {
+				ttl 300s
+			}
+		}
 	}
 
 	reverse_proxy localhost:3000
